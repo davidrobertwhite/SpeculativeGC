@@ -1,6 +1,7 @@
 package uk.ac.glasgow.etparser;
 
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
+import uk.ac.glasgow.etparser.handlers.EventReporters.CountDead;
 
 public class Results {
 	private String benchmark;
@@ -13,12 +14,12 @@ public class Results {
 
 	}
 
-	public Results(String b, Heuristic h, int th, double p, float e) {
-		benchmark = b;
-		heuristic = h;
-		threshold = th;
-		percentage = p;
-		errors = e;
+	public Results(ParameterSettings p) {
+		benchmark = p.getFile();
+		heuristic = p.getHeuristic();
+		threshold = p.getThreshold();
+		percentage = p.getPercentage();
+		errors = CountDead.getErrors();
 	}
 	
 	public String getBenchmark(){
@@ -42,7 +43,7 @@ public class Results {
 	}
 	
 	public String toString(){
-		return benchmark+", "+heuristic+", "+threshold+", "+percentage+", "+errors;
+		return "\""+benchmark+"\""+", "+heuristic+", "+threshold+", "+percentage+", "+errors;
 	}
 
 }

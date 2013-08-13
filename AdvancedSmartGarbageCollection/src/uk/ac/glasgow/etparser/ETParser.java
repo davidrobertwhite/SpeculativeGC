@@ -1,7 +1,11 @@
 package uk.ac.glasgow.etparser;
 
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -60,14 +64,39 @@ public class ETParser {
 
 	}
 	
-	public ETParser(ParameterSettings p){
-		this.input=p.fileStream;
+	public ETParser(ParameterSettings p)throws FileNotFoundException, IOException{
+		this.input=new GZIPInputStream(new FileInputStream(p.getFile()));;
 		handlers = new ArrayList<EventHandler>();
 		lines = 0;
-		heap=p.heap;
-//		heap.setDealWithPostaccess(p.postaccess);
-//		heap.setDealWithPreaccess(p.preaccess);
+		HeapFactory factory=new HeapFactory();
+		heap=factory.createHeap(p.getHeuristic());
+		if(heap!=null){
+		((SmartHeap)heap).specifyPercentageToDeallocate(p.getPercentage()); 
+		((SmartHeap)heap).specifyThreshold(p.getThreshold()); }
+		else{
+			heap=new Heap();
+		}
+		if(p.chart()){
+			heap.createChart();
+			if (p.intervalsSpecified()){
+				heap.specifyWhenToUpdateTheChart(p.getChartIntervals());
+				
+			}
+		}
+		if (p.getPreaccess()!=null){
+			heap.setDealWithPreaccess(p.getPreaccess());
+		}
+		if(p.getPostAccess()!=null){
+			heap.setDealWithPostaccess(p.getPostAccess());
+		}
+		if(p.statisticsLogger()){
+			this.addStatsLogger();
+		}
+
 		initialiseHandlers();
+		if (p.getErrorLogger()!=null){
+			registerHandler(p.getErrorLogger());
+		}
 		
 	}
 
@@ -85,6 +114,7 @@ public class ETParser {
 
 	public void addStatsLogger() {
 		stats = new StatisticsLogger();
+		
 	}
 
 	/**

@@ -1,10 +1,7 @@
 package uk.ac.glasgow.etparser;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.zip.GZIPInputStream;
-
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -12,17 +9,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import uk.ac.glasgow.etparser.handlers.ErrorLogger;
-import uk.ac.glasgow.etparser.handlers.Heap;
-import uk.ac.glasgow.etparser.handlers.SmartHeap;
-import uk.ac.glasgow.etparser.handlers.SmartHeapFIFO;
-import uk.ac.glasgow.etparser.handlers.SmartHeapGC;
-import uk.ac.glasgow.etparser.handlers.SmartHeapLIFO;
-import uk.ac.glasgow.etparser.handlers.SmartHeapLargestSize;
-import uk.ac.glasgow.etparser.handlers.SmartHeapLeastRecentlyUsed;
-import uk.ac.glasgow.etparser.handlers.SmartHeapMostRecentlyUsed;
-import uk.ac.glasgow.etparser.handlers.SmartHeapRandom;
-import uk.ac.glasgow.etparser.handlers.SmartHeapSmallestSize;
+
 
 public class CommandParser {
 
@@ -87,82 +74,46 @@ public class CommandParser {
 		}
 
 		if (cmd.hasOption("unborn")) {
-			settings.preaccess = wayToDealEnumConverter(cmd.getOptionValue("unborn"));
+			settings.setPreAceess(wayToDealEnumConverter(cmd.getOptionValue("unborn")));
 		}
 
 		if (cmd.hasOption("dead")) {
-			settings.postaccess = wayToDealEnumConverter(cmd.getOptionValue("dead"));
+			settings.setPostAccess( wayToDealEnumConverter(cmd.getOptionValue("dead")));
 		}
 
 		if (cmd.hasOption("el")) {
-			settings.errorLogger = new ErrorLogger();
+			settings.setErrorLogger() ;
 		}
 
 		if (cmd.hasOption("heuristic")) {
-			settings.heuristic = heuristicEnumConverter(cmd.getOptionValue("heuristic"));
-			switch (settings.heuristic) {
-			case FIRST:
-				settings.heap = new SmartHeapFIFO();
-				break;
-			case LEASTRECENTLYUSED:
-				settings.heap = new SmartHeapLeastRecentlyUsed();
-				break;
-			case GC:
-				settings.heap = new SmartHeapGC();
-				System.out.println("gc");
-				break;
-			case LAST:
-				settings.heap = new SmartHeapLIFO();
-				break;
-			case MOSTRECENTLYUSED:
-				settings.heap = new SmartHeapMostRecentlyUsed();
-				break;
-			case SMALLEST:
-				settings.heap = new SmartHeapSmallestSize();
-				break;
-			case LARGEST:
-				settings.heap = new SmartHeapLargestSize();
-				break;
-			case RANDOM:
-				settings.heap = new SmartHeapRandom();
-				break;
-			}
-			if (cmd.hasOption("t")) {
+			settings.setHeuristic(heuristicEnumConverter(cmd.getOptionValue("heuristic")));
 
-				((SmartHeap) settings.heap).specifyThreshold(Integer.parseInt(cmd
-						.getOptionValue("t")));
+			if (cmd.hasOption("t")) {
+					settings.setThreshold(Integer.parseInt(cmd.getOptionValue("t")));
 			}
 			if (cmd.hasOption("p")) {
-				((SmartHeap) settings.heap).specifyPercentageToDeallocate(Integer
+				settings.setPercentage(Integer
 						.parseInt(cmd.getOptionValue("p")));
 			}
 		}
-		if (!cmd.hasOption("heuristic")) {
-			settings.heap = new Heap();
-		}
+
 
 		// Now we can interrogate them
-		settings.interactive = cmd.hasOption("i");
-		settings.chart = cmd.hasOption("ch");
-		settings.help = cmd.hasOption("h");
-		settings.statisticsLogger = cmd.hasOption("sl");
+		settings.setInteractive( cmd.hasOption("i"));
+		settings.setChart( cmd.hasOption("ch"));	
+		settings.addStatisticsLogger(cmd.hasOption("sl"));
 
 		// Want at least time or date
-		if (settings.help) {
+		if ( cmd.hasOption("h")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("CommandlineParser", options);
 			System.exit(0);
 
 		}
-//		if (!cmd.hasOption("f") && (!cmd.hasOption("gz"))) {
-//			HelpFormatter formatter = new HelpFormatter();
-//			formatter.printHelp("CommandlineParser", options);
-//			System.out.println("Please enter a filename to process");
-//
-//		}
+
 
 		for (int i = 0; i < reps; i++) {
-			if (settings.interactive) {
+			if (settings.interactive()) {
 				// System.out.println(tf.format(new Date()));
 				displayChoices();
 				askForPreaccess();
@@ -170,10 +121,11 @@ public class CommandParser {
 			}
 
 		}
-		if (settings.chart) {
-			settings.heap.createChart();
+		if (settings.chart()) {
+			settings.setChart(true);
 			if (cmd.hasOption("ei")) {
-				settings.heap.specifyWhenToUpdateTheChart(Integer.parseInt(cmd
+				settings.specifyIntervals();
+				settings.setIntervalToUpdateChart(Integer.parseInt(cmd
 						.getOptionValue("ei")));
 
 			}
@@ -183,37 +135,30 @@ public class CommandParser {
 		try {
 
 			if (cmd.hasOption("f")) {
-				settings.inputFile = cmd.getOptionValue("f");
-				settings.fileStream = new FileInputStream(settings.inputFile);
+				settings.setFile(cmd.getOptionValue("f")) ;
+				
 			}
 
 			if (cmd.hasOption("gz")) {
-				settings.inputFile = cmd.getOptionValue("gz");
-				settings.fileStream = new GZIPInputStream(new FileInputStream(settings.inputFile));
+				settings.setFile(cmd.getOptionValue("f")) ;
+				
 			}
 
-			ETParser etparser = new ETParser(settings);
-			if (settings.errorLogger != null) {
-				etparser.registerHandler(settings.errorLogger);
+//			ETParser etparser = new ETParser(settings);
 
-			}
-			if (settings.statisticsLogger) {
-				etparser.addStatsLogger();
-			}
 //			etparser.processFile();
 //			etparser.printReport();
-			//settings.fileStream.close();
-			BatchParser bp=new BatchParser();
-			bp.doExperiments();
+			BatchParser bp=new BatchParser("results.csv");
+			bp.processFile();
 			long endOfProcess = System.currentTimeMillis();
 			long timeTakenInMillisecs = endOfProcess - startOfProcess;
 			long timeTakenInSeconds = timeTakenInMillisecs / 1000;
 			long timeTakenInMinutes = timeTakenInSeconds / 60;
-			long linesPerSecond = etparser.getLines() / timeTakenInSeconds;
+//			long linesPerSecond = etparser.getLines() / timeTakenInSeconds;
 
 			System.out.println("Time taken " + timeTakenInMinutes + " minutes");
-			System.out.println("The program reads " + linesPerSecond
-					+ " lines per second");
+//			System.out.println("The program reads " + linesPerSecond
+//					+ " lines per second");
 		}
 
 		catch (IOException io) {
@@ -248,7 +193,7 @@ public class CommandParser {
 		scanner.close();
 
 		System.out.println();
-		settings.preaccess = wayToDealEnumConverter(preAccess);
+		settings.setPreAceess( wayToDealEnumConverter(preAccess));
 	}
 
 	private static void askForPostaccess() {
@@ -266,7 +211,7 @@ public class CommandParser {
 			System.out.println("Please enter a valid option");
 			postAccess = scanner.next();
 		}
-		settings.postaccess = wayToDealEnumConverter(postAccess);
+		settings.setPostAccess(wayToDealEnumConverter(postAccess));
 		scanner.close();
 	}
 
