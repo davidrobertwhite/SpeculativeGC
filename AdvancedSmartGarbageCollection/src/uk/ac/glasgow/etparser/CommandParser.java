@@ -9,19 +9,17 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-
-
 public class CommandParser {
 
 	public enum WayToDealWithErrors {
 		IGNORE, MOVE
 	};
+
 	public enum Heuristic {
 		FIRST, LEASTRECENTLYUSED, GC, LARGEST, SMALLEST, RANDOM, MOSTRECENTLYUSED, LAST
 	};
 
-	
-	private static ParameterSettings settings=new ParameterSettings();
+	private static ParameterSettings settings = new ParameterSettings();
 
 	public static void main(String args[]) {
 
@@ -42,10 +40,10 @@ public class CommandParser {
 		options.addOption(
 				"heuristic",
 				true,
-				"choose a heuristic for deleting objects: 'fifo' for first in first out, " +
-				"'lifo' for last in first ot, 'lru' for least recently used," +
-				" 'mru' for most recently used, 'gc' for normal garbage collection," +
-				" 'r' for random, 'ss' for smallest size first, 'ls' for largest size first.");
+				"choose a heuristic for deleting objects: 'fifo' for first in first out, "
+						+ "'lifo' for last in first ot, 'lru' for least recently used,"
+						+ " 'mru' for most recently used, 'gc' for normal garbage collection,"
+						+ " 'r' for random, 'ss' for smallest size first, 'ls' for largest size first.");
 		options.addOption("el", false,
 				"do you want an error logger to show errors?");
 		options.addOption("sl", false,
@@ -55,7 +53,13 @@ public class CommandParser {
 				"enter the percentage you want to deallocate");
 		options.addOption("ei", true,
 				"specify the event interval at which to update the chart");
-
+		options.addOption("rsm", false, "resume writing to existing file");
+		options.addOption(
+				"batch",
+				true,
+				"run the program for the purpose of multiple experiments. specify the file to output in.");
+		options.addOption("et", false,
+				"run the program with concrete parameters");
 		// Parse the arguments
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = null;
@@ -74,47 +78,46 @@ public class CommandParser {
 		}
 
 		if (cmd.hasOption("unborn")) {
-			settings.setPreAceess(wayToDealEnumConverter(cmd.getOptionValue("unborn")));
+			settings.setPreAceess(wayToDealEnumConverter(cmd
+					.getOptionValue("unborn")));
 		}
 
 		if (cmd.hasOption("dead")) {
-			settings.setPostAccess( wayToDealEnumConverter(cmd.getOptionValue("dead")));
+			settings.setPostAccess(wayToDealEnumConverter(cmd
+					.getOptionValue("dead")));
 		}
 
 		if (cmd.hasOption("el")) {
-			settings.setErrorLogger() ;
+			settings.setErrorLogger();
 		}
 
 		if (cmd.hasOption("heuristic")) {
-			settings.setHeuristic(heuristicEnumConverter(cmd.getOptionValue("heuristic")));
+			settings.setHeuristic(heuristicEnumConverter(cmd
+					.getOptionValue("heuristic")));
 
 			if (cmd.hasOption("t")) {
-					settings.setThreshold(Integer.parseInt(cmd.getOptionValue("t")));
+				settings.setThreshold(Integer.parseInt(cmd.getOptionValue("t")));
 			}
 			if (cmd.hasOption("p")) {
-				settings.setPercentage(Integer
-						.parseInt(cmd.getOptionValue("p")));
+				settings.setPercentage(Integer.parseInt(cmd.getOptionValue("p")));
 			}
 		}
 
-
 		// Now we can interrogate them
-		settings.setInteractive( cmd.hasOption("i"));
-		settings.setChart( cmd.hasOption("ch"));	
+		settings.setInteractive(cmd.hasOption("i"));
+		settings.setChart(cmd.hasOption("ch"));
 		settings.addStatisticsLogger(cmd.hasOption("sl"));
 
 		// Want at least time or date
-		if ( cmd.hasOption("h")) {
+		if (cmd.hasOption("h")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("CommandlineParser", options);
 			System.exit(0);
 
 		}
 
-
 		for (int i = 0; i < reps; i++) {
 			if (settings.interactive()) {
-				// System.out.println(tf.format(new Date()));
 				displayChoices();
 				askForPreaccess();
 				askForPostaccess();
@@ -135,30 +138,31 @@ public class CommandParser {
 		try {
 
 			if (cmd.hasOption("f")) {
-				settings.setFile(cmd.getOptionValue("f")) ;
-				
+				settings.setFile(cmd.getOptionValue("f"));
+
 			}
 
 			if (cmd.hasOption("gz")) {
-				settings.setFile(cmd.getOptionValue("f")) ;
-				
+				settings.setFile(cmd.getOptionValue("gz"));
+
 			}
 
-//			ETParser etparser = new ETParser(settings);
-
-//			etparser.processFile();
-//			etparser.printReport();
-			BatchParser bp=new BatchParser("results.csv");
-			bp.processFile();
+			if (cmd.hasOption("et")) {
+				ETParser etparser = new ETParser(settings);
+				etparser.processFile();
+				etparser.printReport();
+			}
+			if (cmd.hasOption("batch")) {
+				BatchParser bp = new BatchParser(cmd.getOptionValue("batch"));
+				bp.setResume(cmd.hasOption("rsm"));
+				bp.processFile();
+			}
 			long endOfProcess = System.currentTimeMillis();
 			long timeTakenInMillisecs = endOfProcess - startOfProcess;
 			long timeTakenInSeconds = timeTakenInMillisecs / 1000;
 			long timeTakenInMinutes = timeTakenInSeconds / 60;
-//			long linesPerSecond = etparser.getLines() / timeTakenInSeconds;
-
 			System.out.println("Time taken " + timeTakenInMinutes + " minutes");
-//			System.out.println("The program reads " + linesPerSecond
-//					+ " lines per second");
+
 		}
 
 		catch (IOException io) {
@@ -193,7 +197,7 @@ public class CommandParser {
 		scanner.close();
 
 		System.out.println();
-		settings.setPreAceess( wayToDealEnumConverter(preAccess));
+		settings.setPreAceess(wayToDealEnumConverter(preAccess));
 	}
 
 	private static void askForPostaccess() {

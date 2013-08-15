@@ -8,8 +8,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 
-public class LiveSizeChart extends ApplicationFrame{
-	
+public class LiveSizeChart extends ApplicationFrame {
+
 	private static final long serialVersionUID = 1L;
 	private XYSeries data;
 
@@ -42,6 +42,5 @@ public class LiveSizeChart extends ApplicationFrame{
 	public void updateChart(double x, double y) {
 		data.add(x, y);
 	}
-	
 
 }

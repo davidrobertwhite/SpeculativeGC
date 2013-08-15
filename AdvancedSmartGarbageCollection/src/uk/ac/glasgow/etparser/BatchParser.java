@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
-
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
 import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.ParameterSettings;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountDead;
 
 public class BatchParser {
 
@@ -25,23 +25,17 @@ public class BatchParser {
 	private FileWriter fileWriter;
 	private PrintWriter printWriter;
 	private String csvFile;
-	private HashMap<ParameterSettings,Results> previousResults;
+	private HashMap<ParameterSettings, Results> previousResults;
+	private boolean resume;
 
-	public BatchParser(String name) {
+	public BatchParser(String name) throws IOException {
 		csvFile = name;
-		previousResults=new HashMap<ParameterSettings,Results>();
-		// try {
-		// fileWriter = new FileWriter(CSVFILE);
-		// } catch (IOException e) {
-		// System.out.println("IOException");
-		// System.exit(0);
-		// }
-		// printWriter = new PrintWriter(fileWriter);
+		previousResults = new HashMap<ParameterSettings, Results>();
 
 	}
 
 	public void doExperiments() throws IOException {
-		addHeader();
+
 		for (String file : files) {
 			System.out.println(file);
 			for (Heuristic h : heuristics) {
@@ -53,31 +47,29 @@ public class BatchParser {
 
 						ParameterSettings param = new ParameterSettings(file,
 								h, threshold, p);
-						ETParser parser = new ETParser(param);
-						parser.processFile();
-				
-						if(previousResults.containsKey(param)){
-							continue;
+						boolean contains = false;
+						for (ParameterSettings ps : previousResults.keySet()) {
+							if (ps.equals(param)) {
+								contains = true;
+								break;
+							}
 						}
-						Results result = new Results(param);
-						previousResults.put(param, result);
-						System.out.println(result);
-						printWriter.println(result.toString());
-						printWriter.flush();
+						if (!contains) {
+							ETParser parser = new ETParser(param);
+							parser.processFile();
+							Results result = new Results(param);
+							previousResults.put(param, result);
+							System.out.println(result);
+							printWriter.println(result.toString());
+							printWriter.flush();
 
-						// addColumn(result);
-
-						// generate a Report object
-						// output param values and report results to a single
-						// line of the CSV output file
+						}
 
 					}
+
 				}
 			}
 		}
-		printWriter.close();
-		fileWriter.close();
-
 	}
 
 	private void addHeader() throws IOException {
@@ -95,40 +87,74 @@ public class BatchParser {
 
 	public void processFile() throws IOException {
 		File f = new File(csvFile);
+
 		if (f.exists()) {
-			Scanner scan = new Scanner(csvFile);
+			if (resume) {
+				Scanner scan = new Scanner(f);
 
-			if (scan.hasNextLine() && headerCorrect(scan.nextLine())) {
-				while (scan.hasNextLine()) {
-					String nextLine = scan.nextLine();
-					Scanner lineScanner = new Scanner(nextLine);
-					ParameterSettings p = new ParameterSettings(
-							lineScanner.next(),CommandParser.heuristicEnumConverter( lineScanner.next()),
-							lineScanner.nextInt(), lineScanner.nextInt());
-					Results r=new Results(p);
-					previousResults.put(p,r);
+				if (scan.hasNextLine() && headerCorrect(scan.nextLine())) {
+					System.out.println("header");
+					while (scan.hasNextLine()) {
+						String nextLine = scan.nextLine();
+						Scanner lineScanner = new Scanner(nextLine);
+						lineScanner.useDelimiter(", ");
+						ParameterSettings p = new ParameterSettings(
+								lineScanner.next(),
+								CommandParser
+										.heuristicEnumConverter(lineScanner
+												.next()),
+								Integer.parseInt(lineScanner.next()),
+								(int) Double.parseDouble(lineScanner.next()));
+
+						Results r = new Results(p, Float.parseFloat(lineScanner
+								.next()));
+						previousResults.put(p, r);
+
+					}
+					;
+				} else {
+					System.out
+							.println("Error- trying to modify a file in different format!!!");
+					System.exit(0);
 				}
-				;
+
+			} else {
+				csvFile = csvFile
+						+ " "
+						+ new SimpleDateFormat("yyyyMMdd_HHmmss")
+								.format(Calendar.getInstance().getTime())
+						+ ".csv";
 			}
-			else {
-				System.out.println("Error- trying to modify a file in different format!!!");
-				System.exit(0);
-			}
-
-
-
+			fileWriter = new FileWriter(csvFile, true);
+			printWriter = new PrintWriter(fileWriter);
 		}
+
+		else {
+			fileWriter = new FileWriter(csvFile);
+			printWriter = new PrintWriter(fileWriter);
+			addHeader();
+		}
+
 		doExperiments();
-		
+		printWriter.close();
+		fileWriter.close();
+
+	}
+
+	public void setResume(boolean r) {
+		resume = r;
 	}
 
 	private boolean headerCorrect(String s) {
 		Scanner scan = new Scanner(s);
+		scan.useDelimiter(", ");
+
 		return scan.next().equalsIgnoreCase("benchmark")
 				&& scan.next().equalsIgnoreCase("heuristic")
 				&& scan.next().equalsIgnoreCase("threshold")
 				&& scan.next().equalsIgnoreCase("percentage")
-				&& scan.next().equalsIgnoreCase("errors");
+				&& scan.next().equalsIgnoreCase("errors") && !scan.hasNext();
+
 	}
 
 }

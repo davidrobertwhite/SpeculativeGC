@@ -1,6 +1,5 @@
 package uk.ac.glasgow.etparser;
 
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +38,7 @@ public class ETParser {
 	private static StatisticsLogger stats;
 	private int lines;
 	private InputStream input;
-	 
+
 	/**
 	 * This heap is analogous to the memory. It contains all the objects
 	 * allocated and also keeps track of all the objects tried to be accessed at
@@ -55,66 +54,54 @@ public class ETParser {
 	 *            : the file to be parsed
 	 */
 
-	public ETParser(InputStream input, Heap h) {
-		this.input = input;
-		handlers = new ArrayList<EventHandler>();
-		lines = 0;
-		heap = h;
-		initialiseHandlers();
 
-	}
-	
-	public ETParser(ParameterSettings p)throws FileNotFoundException, IOException{
-		this.input=new GZIPInputStream(new FileInputStream(p.getFile()));;
+
+	public ETParser(ParameterSettings p) throws FileNotFoundException,
+			IOException {
+		this.input = new GZIPInputStream(new FileInputStream(p.getFile()));
+		;
 		handlers = new ArrayList<EventHandler>();
 		lines = 0;
-		HeapFactory factory=new HeapFactory();
-		heap=factory.createHeap(p.getHeuristic());
-		if(heap!=null){
-		((SmartHeap)heap).specifyPercentageToDeallocate(p.getPercentage()); 
-		((SmartHeap)heap).specifyThreshold(p.getThreshold()); }
-		else{
-			heap=new Heap();
+		HeapFactory factory = new HeapFactory();
+		if (p.getHeuristic() != null) {
+			heap = factory.createHeap(p.getHeuristic());
+			if (heap != null) {
+				((SmartHeap) heap).specifyPercentageToDeallocate(p
+						.getPercentage());
+				((SmartHeap) heap).specifyThreshold(p.getThreshold());
+			}
+
+		} else {
+			heap = new Heap();
 		}
-		if(p.chart()){
+		if (p.chart()) {
 			heap.createChart();
-			if (p.intervalsSpecified()){
+			if (p.intervalsSpecified()) {
 				heap.specifyWhenToUpdateTheChart(p.getChartIntervals());
-				
+
 			}
 		}
-		if (p.getPreaccess()!=null){
+		if (p.getPreaccess() != null) {
 			heap.setDealWithPreaccess(p.getPreaccess());
 		}
-		if(p.getPostAccess()!=null){
+		if (p.getPostAccess() != null) {
 			heap.setDealWithPostaccess(p.getPostAccess());
 		}
-		if(p.statisticsLogger()){
+		if (p.statisticsLogger()) {
 			this.addStatsLogger();
 		}
 
 		initialiseHandlers();
-		if (p.getErrorLogger()!=null){
+		if (p.getErrorLogger() != null) {
 			registerHandler(p.getErrorLogger());
 		}
-		
-	}
-
-	public ETParser(InputStream input, Heap h, WayToDealWithErrors preaccess,
-			WayToDealWithErrors postaccess) {
-		this.input = input;
-		handlers = new ArrayList<EventHandler>();
-		lines = 0;
-		heap = h;
-		heap.setDealWithPostaccess(postaccess);
-		heap.setDealWithPreaccess(preaccess);
-		initialiseHandlers();
 
 	}
+
 
 	public void addStatsLogger() {
 		stats = new StatisticsLogger();
-		
+
 	}
 
 	/**
@@ -128,14 +115,13 @@ public class ETParser {
 		while (scanner.hasNextLine()) {
 
 			String nextLine = scanner.nextLine();
-//			System.out.println(nextLine);
 			lines++;
 			Event event = new Event(nextLine);
 			notifyHandlers(event);
 
 		}
 		scanner.close();
-		
+
 	}
 
 	public static Heap getTheHeap() {

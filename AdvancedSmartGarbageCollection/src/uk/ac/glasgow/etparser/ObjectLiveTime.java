@@ -13,7 +13,6 @@ package uk.ac.glasgow.etparser;
  */
 public class ObjectLiveTime {
 
-
 	private String objectID;
 	private boolean born;
 	private boolean dead;
@@ -39,8 +38,8 @@ public class ObjectLiveTime {
 	public boolean isDead() {
 		return dead;
 	}
-	
-	public String getObjectID(){
+
+	public String getObjectID() {
 		return objectID;
 	}
 }

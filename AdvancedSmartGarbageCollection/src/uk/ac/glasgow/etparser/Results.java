@@ -21,29 +21,39 @@ public class Results {
 		percentage = p.getPercentage();
 		errors = CountDead.getErrors();
 	}
-	
-	public String getBenchmark(){
-		return benchmark;
-		
+
+	public Results(ParameterSettings p, float e) {
+		benchmark = p.getFile();
+		heuristic = p.getHeuristic();
+		threshold = p.getThreshold();
+		percentage = p.getPercentage();
+		errors = e;
 	}
-	
-	public String getHeuristic(){
+
+	public String getBenchmark() {
+		return benchmark;
+
+	}
+
+	public String getHeuristic() {
 		return heuristic.toString();
 	}
-	
-	public int getThreshold(){
+
+	public int getThreshold() {
 		return threshold;
 	}
-	
-	public double getPercentage(){
+
+	public double getPercentage() {
 		return percentage;
 	}
-	public float getErrors(){
+
+	public float getErrors() {
 		return errors;
 	}
-	
-	public String toString(){
-		return "\""+benchmark+"\""+", "+heuristic+", "+threshold+", "+percentage+", "+errors;
+
+	public String toString() {
+		return benchmark + ", " + heuristic + ", " + threshold + ", "
+				+ percentage + ", " + errors;
 	}
 
 }

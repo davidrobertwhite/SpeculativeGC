@@ -10,10 +10,10 @@ import uk.ac.glasgow.etparser.events.Event.TypeOfEvent;
 public abstract class SmartHeap extends Heap {
 
 	protected int threshold; // default would be 70000 for now unless
-									// otherwise specified
+								// otherwise specified
 
 	private double percentageToDeallocate; // default would be 20% if not
-													// otherwise specified
+											// otherwise specified
 
 	protected List<String> allocatedObjects;
 
@@ -41,9 +41,10 @@ public abstract class SmartHeap extends Heap {
 	}
 
 	protected boolean sizeNormal() {
-		return allocatedMemSize <= threshold-(percentageToDeallocate * threshold) && allocatedMemSize >= 0;
+		return allocatedMemSize <= threshold
+				- (percentageToDeallocate * threshold)
+				&& allocatedMemSize >= 0;
 	}
-
 
 	@Override
 	public void handle(Event e) {
@@ -61,8 +62,7 @@ public abstract class SmartHeap extends Heap {
 				allocateObject(e);
 				allocatedObjects.add(currentObjectID);
 				chart.updateChart(timeSequence, livesize);
-//				 System.out.println("first allocation of " + currentObjectID);
-				 //check for memory excess
+				// check for memory excess
 				if (checkSizeLimitExcess()) {
 					deallocate();
 
@@ -73,8 +73,7 @@ public abstract class SmartHeap extends Heap {
 			// if the event isn't allocation
 			// report for notborn error
 			else {
-//				 System.out.println("not born because not allocated "
-//				 + currentObjectID);
+
 				e.setCheck(Check.NOTBORN);
 			}
 			everSeen.put(currentObjectID, livetime);
@@ -91,24 +90,18 @@ public abstract class SmartHeap extends Heap {
 					everSeen.get(currentObjectID).giveBirth();
 					allocateObject(e);
 					allocatedObjects.add(currentObjectID);
-//					System.out
-//							.println("first allocation of " + currentObjectID);
 					chart.updateChart(timeSequence, livesize);
 					// check for memory excess
 					if (checkSizeLimitExcess()) {
 						deallocate();
-						
-						
 
 					}
 					chart.updateChart(timeSequence, livesize);
-					
 
 				}
 				// if the event isn't allocation report not born error
 				else {
-//					 System.out.println("not born because not allocated2 "
-//					 + currentObjectID);
+
 					e.setCheck(Check.NOTBORN);
 
 				}
@@ -123,15 +116,11 @@ public abstract class SmartHeap extends Heap {
 				// if it was never born, probably preaccess before and now again
 				// or probably dead
 				if (!currentObjectLivetime.isBorn()) {
-//					System.out
-//							.println("not live but exists- either preaccess or it was dead "
-//									+ currentObjectID);
 					e.setCheck(Check.NOTBORN);
 				}
 				// the object died before this access
 				else if (currentObjectLivetime.isDead()) {
 					e.setCheck(Check.DEAD);
-//					 System.out.println("dead " + currentObjectID);
 				}
 				// it's legal to update this object
 				else {
@@ -144,12 +133,9 @@ public abstract class SmartHeap extends Heap {
 
 						killObject(currentObjectID);
 						chart.updateChart(timeSequence, livesize);
-//						 System.out.println(livesize + " livesize, " +
-//						 allocatedMemSize+" allocated memory");
 					} else {
 						updateObject(e);
-//						 System.out.println("legal access " +
-//						 currentObjectID);
+
 					}
 
 				}

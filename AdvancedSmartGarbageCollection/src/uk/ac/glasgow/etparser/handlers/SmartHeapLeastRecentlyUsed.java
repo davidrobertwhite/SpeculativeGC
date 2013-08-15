@@ -25,9 +25,7 @@ public class SmartHeapLeastRecentlyUsed extends SmartHeap {
 			killObject(currentObjectID);
 			deallocate(currentObjectID);
 
-			// System.out.println("Deallocate "+currentObjectID);
 		}
-		// System.out.println("least");
 
 	}
 

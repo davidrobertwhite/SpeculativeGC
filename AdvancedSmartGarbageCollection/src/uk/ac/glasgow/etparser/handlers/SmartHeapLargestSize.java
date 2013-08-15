@@ -25,20 +25,9 @@ public class SmartHeapLargestSize extends SmartHeap {
 			// it would be treated as a dead object from now on
 			killObject(currentObjectID);
 			deallocate(currentObjectID);
-
-			// System.out.println("Deallocate "+currentObjectID);
 		}
-		// System.out.println("least");
 
 	}
-
-	/**
-	 * Method the takes all objects from the heap and orders them into a list of
-	 * objects sorted by their time of last access. Good if we want to dispose
-	 * of least recently used objects.
-	 * 
-	 * @return list of all objects sorted according to the time of last access
-	 */
 
 	public List<ObjectClass> getListOfObjectClassTimeSorted() {
 		HashMap<String, ObjectClass> objects = getObjectStates();
@@ -48,7 +37,6 @@ public class SmartHeapLargestSize extends SmartHeap {
 
 		}
 
-		// does this work properly???
 		Collections.sort(listOfObjects, new Comparator<ObjectClass>() {
 			public int compare(ObjectClass o2, ObjectClass o1) {
 				return Integer.compare(o1.getSize(), o2.getSize());
