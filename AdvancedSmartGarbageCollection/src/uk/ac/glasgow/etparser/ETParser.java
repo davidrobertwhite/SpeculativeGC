@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import uk.ac.glasgow.etparser.CommandParser.WayToDealWithErrors;
 import uk.ac.glasgow.etparser.events.*;
 import uk.ac.glasgow.etparser.handlers.*;
 import uk.ac.glasgow.etparser.handlers.EventReporters.CountCreation;
@@ -35,7 +34,6 @@ public class ETParser {
 	/**
 	 * This variable counts the lines read so far.
 	 */
-	private static StatisticsLogger stats;
 	private int lines;
 	private InputStream input;
 
@@ -45,6 +43,7 @@ public class ETParser {
 	 * any point of the program.
 	 */
 	private static Heap heap;
+	private boolean chart;
 
 	/**
 	 * Constructor initializing the ETParser which takes an InputStream and does
@@ -62,7 +61,7 @@ public class ETParser {
 		;
 		handlers = new ArrayList<EventHandler>();
 		lines = 0;
-		HeapFactory factory = new HeapFactory();
+		SmartHeapFactory factory = new SmartHeapFactory();
 		if (p.getHeuristic() != null) {
 			heap = factory.createHeap(p.getHeuristic());
 			if (heap != null) {
@@ -74,35 +73,20 @@ public class ETParser {
 		} else {
 			heap = new Heap();
 		}
-		if (p.chart()) {
-			heap.createChart();
-			if (p.intervalsSpecified()) {
-				heap.specifyWhenToUpdateTheChart(p.getChartIntervals());
+		chart=p.chart();
 
-			}
-		}
 		if (p.getPreaccess() != null) {
 			heap.setDealWithPreaccess(p.getPreaccess());
 		}
 		if (p.getPostAccess() != null) {
 			heap.setDealWithPostaccess(p.getPostAccess());
 		}
-		if (p.statisticsLogger()) {
-			this.addStatsLogger();
-		}
+
 
 		initialiseHandlers();
-		if (p.getErrorLogger() != null) {
-			registerHandler(p.getErrorLogger());
-		}
 
 	}
 
-
-	public void addStatsLogger() {
-		stats = new StatisticsLogger();
-
-	}
 
 	/**
 	 * 
@@ -186,6 +170,9 @@ public class ETParser {
 		registerHandler(multiple);
 		EventHandler dead = new CountDead();
 		registerHandler(dead);
+		LiveSizeChart ch=new LiveSizeChart(heap);
+		ch.setVisible(chart);
+		registerHandler(ch);
 
 	}
 
@@ -196,10 +183,6 @@ public class ETParser {
 	 */
 	public List<EventHandler> getHandlers() {
 		return handlers;
-	}
-
-	public static StatisticsLogger getLogger() {
-		return stats;
 	}
 
 }

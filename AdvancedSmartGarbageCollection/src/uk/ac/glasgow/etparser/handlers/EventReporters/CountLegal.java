@@ -2,8 +2,6 @@ package uk.ac.glasgow.etparser.handlers.EventReporters;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.events.Event;
 import uk.ac.glasgow.etparser.events.Event.Check;
 import uk.ac.glasgow.etparser.handlers.EventHandler;
@@ -60,13 +58,6 @@ public class CountLegal implements EventHandler, EventReport {
 	@Override
 	public String finalReport() {
 
-		if (ETParser.getLogger() != null) {
-			ETParser.getLogger()
-					.getLogger()
-					.info((float) legals.size() / totalObjectsInHeap
-							* PERCENTAGE
-							+ " % objects were updates successfully");
-		}
 
 		return (float) legals.size() / totalObjectsInHeap * PERCENTAGE
 				+ " % objects were updated successfully";

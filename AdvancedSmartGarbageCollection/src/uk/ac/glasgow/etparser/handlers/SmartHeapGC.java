@@ -3,7 +3,8 @@ package uk.ac.glasgow.etparser.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.glasgow.etparser.ObjectLiveTime;
+import uk.ac.glasgow.etparser.ObjectStatus;
+
 
 public class SmartHeapGC extends SmartHeap {
 	private int multiplier = 1;
@@ -16,9 +17,9 @@ public class SmartHeapGC extends SmartHeap {
 
 	private List<String> currentlyDeadObjects() {
 		List<String> deadObjects = new ArrayList<String>();
-		for (ObjectLiveTime o : everSeen.values()) {
+		for (ObjectStatus o : everSeen.values()) {
 			if (o.isDead()) {
-				deadObjects.add(o.getObjectID());
+				deadObjects.add(o.getID());
 			}
 		}
 		return deadObjects;

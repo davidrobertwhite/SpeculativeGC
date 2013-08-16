@@ -2,7 +2,7 @@ package uk.ac.glasgow.etparser.handlers;
 
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
 
-public class HeapFactory {
+public class SmartHeapFactory {
 	
 	public SmartHeap createHeap(Heuristic h){
 		SmartHeap heap;

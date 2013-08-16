@@ -2,8 +2,6 @@ package uk.ac.glasgow.etparser.handlers.EventReporters;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.events.Event;
 import uk.ac.glasgow.etparser.events.Event.Check;
 import uk.ac.glasgow.etparser.handlers.EventHandler;
@@ -61,16 +59,6 @@ public class CountDead implements EventHandler, EventReport {
 	@Override
 	public String finalReport() {
 
-		if (ETParser.getLogger() != null) {
-			ETParser.getLogger()
-					.getLogger()
-					.info((float) dead.size() / totalObjectsInHeap * PERCENTAGE
-							+ " % objects cause dead error");
-			
-		}
-//		for (String d:dead){
-//			System.out.println(d+" ");
-//		}
 		return (float) dead.size() / totalObjectsInHeap * PERCENTAGE
 				+ " % objects cause dead error";
 	}

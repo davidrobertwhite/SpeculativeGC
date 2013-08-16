@@ -2,23 +2,18 @@ package uk.ac.glasgow.etparser;
 
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
 import uk.ac.glasgow.etparser.CommandParser.WayToDealWithErrors;
-import uk.ac.glasgow.etparser.handlers.ErrorLogger;
-import uk.ac.glasgow.etparser.handlers.EventHandler;
 
 public class ParameterSettings {
 
-	private boolean interactive = false;
 	private boolean chart = false;
 	private boolean intervals;
-	private EventHandler errorLogger;
-	private boolean statisticsLogger;
 	private String inputFile;
 	private int threshold;
 	private int percentage;
 	private Heuristic heuristic;
 	private WayToDealWithErrors preaccess;
 	private WayToDealWithErrors postaccess;
-	private int intervalToUpdateChart;
+
 
 	public ParameterSettings(String file, Heuristic h, int threshold,
 			int percentage) {
@@ -60,9 +55,6 @@ public class ParameterSettings {
 		chart = ch;
 	}
 
-	public void setIntervalToUpdateChart(int i) {
-		intervalToUpdateChart = i;
-	}
 
 	public void setThreshold(int t) {
 		threshold = t;
@@ -77,9 +69,6 @@ public class ParameterSettings {
 		return chart;
 	}
 
-	public boolean interactive() {
-		return interactive;
-	}
 
 	public WayToDealWithErrors getPreaccess() {
 		return preaccess;
@@ -97,9 +86,6 @@ public class ParameterSettings {
 		postaccess = post;
 	}
 
-	public int getChartIntervals() {
-		return intervalToUpdateChart;
-	}
 
 	public void specifyIntervals() {
 		intervals = true;
@@ -109,25 +95,7 @@ public class ParameterSettings {
 		return intervals;
 	}
 
-	public void setErrorLogger() {
-		errorLogger = new ErrorLogger();
-	}
 
-	public EventHandler getErrorLogger() {
-		return errorLogger;
-	}
-
-	public void addStatisticsLogger(boolean b) {
-		statisticsLogger = b;
-	}
-
-	public void setInteractive(boolean b) {
-		interactive = b;
-	}
-
-	public boolean statisticsLogger() {
-		return statisticsLogger;
-	}
 
 	public String toString() {
 		return inputFile + heuristic + threshold + " " + percentage;

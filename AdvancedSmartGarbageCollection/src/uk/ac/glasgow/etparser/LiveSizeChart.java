@@ -8,17 +8,24 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 
-public class LiveSizeChart extends ApplicationFrame {
+import uk.ac.glasgow.etparser.events.Event;
+import uk.ac.glasgow.etparser.events.Event.TypeOfEvent;
+import uk.ac.glasgow.etparser.handlers.EventHandler;
+import uk.ac.glasgow.etparser.handlers.Heap;
+
+public class LiveSizeChart extends ApplicationFrame implements EventHandler{
 
 	private static final long serialVersionUID = 1L;
 	private XYSeries data;
-
-	public LiveSizeChart() {
+	private Heap heap;
+	private int EVENTSINTERVAL = 10000;
+	public LiveSizeChart(Heap h) {
 
 		super("Live size chart");
-
+		heap=h;
 		data = new XYSeries("Data");
 		data.add(0, 0);
+		
 
 		XYSeriesCollection dataset = new XYSeriesCollection(data);
 
@@ -41,6 +48,12 @@ public class LiveSizeChart extends ApplicationFrame {
 
 	public void updateChart(double x, double y) {
 		data.add(x, y);
+	}
+
+	@Override
+	public void handle(Event e) {
+		if (e.getTypeOfEvent()==TypeOfEvent.ALLOCATION||e.getTypeOfEvent()==TypeOfEvent.DEATH||heap.getTimeSequence() % EVENTSINTERVAL == 0)
+			updateChart(heap.getTimeSequence(), heap.getLiveSize());		
 	}
 
 }

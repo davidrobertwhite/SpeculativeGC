@@ -2,10 +2,8 @@ package uk.ac.glasgow.etparser.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.ac.glasgow.etparser.ObjectLiveTime;
 import uk.ac.glasgow.etparser.events.Event;
-import uk.ac.glasgow.etparser.events.Event.Check;
-import uk.ac.glasgow.etparser.events.Event.TypeOfEvent;
+
 
 public abstract class SmartHeap extends Heap {
 
@@ -46,107 +44,18 @@ public abstract class SmartHeap extends Heap {
 				&& allocatedMemSize >= 0;
 	}
 
+
 	@Override
-	public void handle(Event e) {
-		timeSequence++;
-		String currentObjectID = e.getObjectID();
-		TypeOfEvent currentEventType = e.getTypeOfEvent();
-		// if never seen before
-		if (!existsInEverSeen(currentObjectID)) {
-			// create a new livetime for this object
-			ObjectLiveTime livetime = new ObjectLiveTime(currentObjectID);
-			everSeen.put(currentObjectID, livetime);
-			// if the event is allocation- great
-			if (currentEventType == TypeOfEvent.ALLOCATION) {
-				livetime.giveBirth();
-				allocateObject(e);
-				allocatedObjects.add(currentObjectID);
-				chart.updateChart(timeSequence, livesize);
-				// check for memory excess
-				if (checkSizeLimitExcess()) {
-					deallocate();
-
-				}
-				chart.updateChart(timeSequence, livesize);
-
-			}
-			// if the event isn't allocation
-			// report for notborn error
-			else {
-
-				e.setCheck(Check.NOTBORN);
-			}
-			everSeen.put(currentObjectID, livetime);
+	protected void allocateObject(Event e){
+		super.allocateObject(e);
+		allocatedObjects.add(e.getObjectID());
+		// check for memory excess
+		if (checkSizeLimitExcess()) {
+			deallocate();
 
 		}
-
-		// the object has been seen before
-		else {
-			// if it wasn't allocated (check whether it has been deallocated
-			if (!existsInHeap(currentObjectID)
-					&& !everSeen.get(currentObjectID).isDead()) {
-				// if the event is allocation- perfect
-				if (currentEventType == TypeOfEvent.ALLOCATION) {
-					everSeen.get(currentObjectID).giveBirth();
-					allocateObject(e);
-					allocatedObjects.add(currentObjectID);
-					chart.updateChart(timeSequence, livesize);
-					// check for memory excess
-					if (checkSizeLimitExcess()) {
-						deallocate();
-
-					}
-					chart.updateChart(timeSequence, livesize);
-
-				}
-				// if the event isn't allocation report not born error
-				else {
-
-					e.setCheck(Check.NOTBORN);
-
-				}
-
-			}
-			// it has been allocated
-			else {
-
-				// take the object and check it's livetime
-				ObjectLiveTime currentObjectLivetime = everSeen
-						.get(currentObjectID);
-				// if it was never born, probably preaccess before and now again
-				// or probably dead
-				if (!currentObjectLivetime.isBorn()) {
-					e.setCheck(Check.NOTBORN);
-				}
-				// the object died before this access
-				else if (currentObjectLivetime.isDead()) {
-					e.setCheck(Check.DEAD);
-				}
-				// it's legal to update this object
-				else {
-					// if the event isn't dead just make the update
-					e.setCheck(Check.LEGAL);
-
-					// if it was a death event kill the object in everLived,
-					// deallocate it from the heap
-					if (currentEventType == TypeOfEvent.DEATH) {
-
-						killObject(currentObjectID);
-						chart.updateChart(timeSequence, livesize);
-					} else {
-						updateObject(e);
-
-					}
-
-				}
-
-			}
-
-		}
-		if (timeSequence % EVENTSINTERVAL == 0)
-			chart.updateChart(timeSequence, livesize);
+		
 	}
-
 	// must be overridden by subclasses
 	protected abstract void deallocate();
 

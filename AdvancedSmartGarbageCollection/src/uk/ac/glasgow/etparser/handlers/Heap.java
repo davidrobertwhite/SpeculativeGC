@@ -1,10 +1,8 @@
 package uk.ac.glasgow.etparser.handlers;
 
 import java.util.HashMap;
-import uk.ac.glasgow.etparser.LiveSizeChart;
-import uk.ac.glasgow.etparser.ObjectClass;
+import uk.ac.glasgow.etparser.ObjectStatus;
 import uk.ac.glasgow.etparser.CommandParser.WayToDealWithErrors;
-import uk.ac.glasgow.etparser.ObjectLiveTime;
 import uk.ac.glasgow.etparser.events.Event;
 import uk.ac.glasgow.etparser.events.Event.Check;
 import uk.ac.glasgow.etparser.events.Event.TypeOfEvent;
@@ -16,44 +14,32 @@ public class Heap implements EventHandler {
 	 * Measures time sequentially (1, 2, 3...).
 	 */
 	protected int timeSequence;
-	/**
-	 * Measures time as function of the allocated objects' sizes.
-	 */
-	protected int timeSize;
 
-	/**
-	 * Measures time in terms of method entry and method exit.
-	 */
-	protected int timeMethod;
 	/**
 	 * A hash map that keeps the object id and the last event that happened to
 	 * that object.
 	 */
-	protected HashMap<String, ObjectClass> memory;
+	protected HashMap<String, ObjectStatus> memory;
 
-	protected HashMap<String, ObjectLiveTime> everSeen;
+	protected HashMap<String, ObjectStatus> everSeen;
 
 	protected int livesize, allocatedMemSize;
 
-	protected LiveSizeChart chart;
 
 	protected WayToDealWithErrors dealWithPreaccess, dealWithPostAccess;
 
-	protected int EVENTSINTERVAL = 10000;
+
 
 	/**
 	 * Initializes the class variables. Private because of Singleton design
 	 * pattern.
 	 */
 	public Heap() {
-		chart = new LiveSizeChart();
 		livesize = 0;
 		allocatedMemSize = 0;
 		timeSequence = 0;
-		timeSize = 0;
-		timeMethod = 0;
-		memory = new HashMap<String, ObjectClass>();
-		everSeen = new HashMap<String, ObjectLiveTime>();
+		memory = new HashMap<String, ObjectStatus>();
+		everSeen = new HashMap<String, ObjectStatus>();
 		System.out.println("You created a new Heap");
 
 	}
@@ -68,16 +54,9 @@ public class Heap implements EventHandler {
 		dealWithPostAccess = wayToDeal;
 
 	}
+	
 
-	public void createChart() {
-		chart.setVisible(true);
 
-	}
-
-	public void specifyWhenToUpdateTheChart(int i) {
-		EVENTSINTERVAL = i;
-		System.out.println(EVENTSINTERVAL + " interval");
-	}
 
 	/**
 	 * Checks whether the event is legal and if it is, it updates the event
@@ -90,20 +69,20 @@ public class Heap implements EventHandler {
 	public void handle(Event e) {
 
 		timeSequence++;
+		assert timeSequence>0;
 		String currentObjectID = e.getObjectID();
 		TypeOfEvent currentEventType = e.getTypeOfEvent();
 		// if never seen before
 		if (!existsInEverSeen(currentObjectID)) {
 
 			// create a new livetime for this object
-			ObjectLiveTime livetime = new ObjectLiveTime(currentObjectID);
+			ObjectStatus livetime = new ObjectStatus(timeSequence,currentObjectID,currentEventType);
 			everSeen.put(currentObjectID, livetime);
 
 			// if the event is allocation- great
 			if (currentEventType == TypeOfEvent.ALLOCATION) {
 				livetime.giveBirth();
 				allocateObject(e);
-				chart.updateChart(timeSequence, livesize);
 
 			}
 			// if the event isn't allocation
@@ -112,7 +91,6 @@ public class Heap implements EventHandler {
 
 				e.setCheck(Check.NOTBORN);
 			}
-			everSeen.put(currentObjectID, livetime);
 
 		}
 
@@ -125,7 +103,6 @@ public class Heap implements EventHandler {
 				if (currentEventType == TypeOfEvent.ALLOCATION) {
 					everSeen.get(currentObjectID).giveBirth();
 					allocateObject(e);
-					chart.updateChart(timeSequence, livesize);
 
 				}
 				// if the event isn't allocation report not born error
@@ -139,7 +116,7 @@ public class Heap implements EventHandler {
 			else {
 
 				// take the object and check it's livetime
-				ObjectLiveTime currentObjectLivetime = everSeen
+				ObjectStatus currentObjectLivetime = everSeen
 						.get(currentObjectID);
 				// if it was never born, probably preaccess before and now again
 				// or probably dead
@@ -161,7 +138,6 @@ public class Heap implements EventHandler {
 					if (currentEventType == TypeOfEvent.DEATH) {
 
 						killObject(currentObjectID);
-						chart.updateChart(timeSequence, livesize);
 					} else {
 						updateObject(e);
 
@@ -172,12 +148,12 @@ public class Heap implements EventHandler {
 			}
 
 		}
-		if (timeSequence % EVENTSINTERVAL == 0)
-			chart.updateChart(timeSequence, livesize);
+
 	}
 
+
 	protected void deallocate(String objectID) {
-		ObjectClass remove = memory.remove(objectID);
+		ObjectStatus remove = memory.remove(objectID);
 		allocatedMemSize -= remove.getSize();
 	}
 
@@ -200,36 +176,32 @@ public class Heap implements EventHandler {
 		int size = e.getSize();
 		livesize += size;
 		allocatedMemSize += size;
-		ObjectClass object = new ObjectClass(size, timeSequence,
-				currentObjectID);
+		ObjectStatus object = new ObjectStatus(timeSequence,
+				currentObjectID,TypeOfEvent.ALLOCATION);
+		object.setSize(size);
 		everSeen.get(currentObjectID).giveBirth();
 		memory.put(currentObjectID, object);
 		e.setCheck(Check.CREATION);
-		timeSize += size;
 
 	}
 
 	protected void allocateObjectCheater(Event e) {
 		String currentObjectID = e.getObjectID();
-		ObjectClass object = new ObjectClass(0, timeSequence, currentObjectID);
+		ObjectStatus object = new ObjectStatus( timeSequence, currentObjectID,TypeOfEvent.ALLOCATION);
+		object.setSize(e.getSize());
 		everSeen.get(currentObjectID).giveBirth();
 		memory.put(currentObjectID, object);
 		e.setCheck(Check.CREATION);
-		timeSize += e.getSize();
 
 	}
 
 	protected void updateObject(Event e) {
 		String currentObjectID = e.getObjectID();
-		ObjectClass accessedObject = memory.get(currentObjectID);
+		ObjectStatus accessedObject = memory.get(currentObjectID);
 		if (accessedObject != null) {
-			TypeOfEvent currentEventStatus = e.getTypeOfEvent();
 			accessedObject.updateEvent(timeSequence, e.getTypeOfEvent());
 			memory.put(currentObjectID, accessedObject);
 			e.setCheck(Check.LEGAL);
-			if (currentEventStatus == TypeOfEvent.METHOD) {
-				timeMethod++;
-			}
 
 		}
 
@@ -272,7 +244,7 @@ public class Heap implements EventHandler {
 	 *            the id of the object we want to access in the heap.
 	 * @return the last event record for the given object.
 	 */
-	public ObjectClass getRecord(String oid) {
+	public ObjectStatus getRecord(String oid) {
 		return memory.get(oid);
 	}
 
@@ -284,21 +256,6 @@ public class Heap implements EventHandler {
 		return timeSequence;
 	}
 
-	/**
-	 * 
-	 * @return the current time expressed as allocated object size.
-	 */
-	public int getTimeSize() {
-		return timeSize;
-	}
-
-	/**
-	 * 
-	 * @return the current time expressed in term of method entry and exit.
-	 */
-	public int getTimeMethod() {
-		return timeMethod;
-	}
 
 	// getters
 
@@ -310,7 +267,7 @@ public class Heap implements EventHandler {
 		return allocatedMemSize;
 	}
 
-	public HashMap<String, ObjectLiveTime> getEverSeen() {
+	public HashMap<String, ObjectStatus> getEverSeen() {
 		return everSeen;
 
 	}
@@ -346,7 +303,7 @@ public class Heap implements EventHandler {
 
 	}
 
-	public HashMap<String, ObjectClass> getObjectStates() {
+	public HashMap<String, ObjectStatus> getObjectStates() {
 
 		return memory;
 	}

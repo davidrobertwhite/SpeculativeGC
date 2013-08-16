@@ -1,7 +1,6 @@
 package uk.ac.glasgow.etparser;
 
 import java.io.IOException;
-import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -19,18 +18,15 @@ public class CommandParser {
 		FIRST, LEASTRECENTLYUSED, GC, LARGEST, SMALLEST, RANDOM, MOSTRECENTLYUSED, LAST
 	};
 
-	private static ParameterSettings settings = new ParameterSettings();
-
 	public static void main(String args[]) {
+		ParameterSettings settings = new ParameterSettings();
 
 		Options options = new Options();
 
 		// First parameter is the option name
 		// Second parameter is whether this is a switch or argument
 		// Third is a description
-		options.addOption("i", false, "run the program interactively");
 		options.addOption("ch", false, "display a livechart");
-		options.addOption("r", true, "number of times to repeat the run");
 		options.addOption("f", true, "input file name");
 		options.addOption("gz", true, "input gz file");
 		options.addOption("unborn", true,
@@ -44,15 +40,10 @@ public class CommandParser {
 						+ "'lifo' for last in first ot, 'lru' for least recently used,"
 						+ " 'mru' for most recently used, 'gc' for normal garbage collection,"
 						+ " 'r' for random, 'ss' for smallest size first, 'ls' for largest size first.");
-		options.addOption("el", false,
-				"do you want an error logger to show errors?");
-		options.addOption("sl", false,
-				"do you want an statistics logger to record the statistics?");
 		options.addOption("t", true, "enter the threshold");
 		options.addOption("p", true,
 				"enter the percentage you want to deallocate");
-		options.addOption("ei", true,
-				"specify the event interval at which to update the chart");
+
 		options.addOption("rsm", false, "resume writing to existing file");
 		options.addOption(
 				"batch",
@@ -72,10 +63,6 @@ public class CommandParser {
 			System.exit(-1);
 		}
 
-		int reps = 1;
-		if (cmd.hasOption("r")) {
-			reps = Integer.parseInt(cmd.getOptionValue("r"));
-		}
 
 		if (cmd.hasOption("unborn")) {
 			settings.setPreAceess(wayToDealEnumConverter(cmd
@@ -87,9 +74,6 @@ public class CommandParser {
 					.getOptionValue("dead")));
 		}
 
-		if (cmd.hasOption("el")) {
-			settings.setErrorLogger();
-		}
 
 		if (cmd.hasOption("heuristic")) {
 			settings.setHeuristic(heuristicEnumConverter(cmd
@@ -104,9 +88,7 @@ public class CommandParser {
 		}
 
 		// Now we can interrogate them
-		settings.setInteractive(cmd.hasOption("i"));
 		settings.setChart(cmd.hasOption("ch"));
-		settings.addStatisticsLogger(cmd.hasOption("sl"));
 
 		// Want at least time or date
 		if (cmd.hasOption("h")) {
@@ -116,23 +98,6 @@ public class CommandParser {
 
 		}
 
-		for (int i = 0; i < reps; i++) {
-			if (settings.interactive()) {
-				displayChoices();
-				askForPreaccess();
-				askForPostaccess();
-			}
-
-		}
-		if (settings.chart()) {
-			settings.setChart(true);
-			if (cmd.hasOption("ei")) {
-				settings.specifyIntervals();
-				settings.setIntervalToUpdateChart(Integer.parseInt(cmd
-						.getOptionValue("ei")));
-
-			}
-		}
 
 		long startOfProcess = System.currentTimeMillis();
 		try {
@@ -170,53 +135,6 @@ public class CommandParser {
 			System.exit(0);
 		}
 
-	}
-
-	private static void displayChoices() {
-
-		System.out
-				.println("Hello, dear user! Before you start the smart garbage collector simulator"
-						+ " you must choose how to deal with pre-access and post-access errors.");
-		System.out.println();
-	}
-
-	private static void askForPreaccess() {
-		System.out.println("First choose dealing with pre-access errors:");
-		System.out.println();
-		System.out.println("Enter 'IGNORE' to ignore them.");
-		System.out
-				.println("Enter 'MOVE' to allocate them at their first access.");
-		System.out.println();
-		Scanner scanner = new Scanner(System.in);
-		String preAccess = scanner.nextLine();
-		while (!preAccess.equalsIgnoreCase("IGNORE")
-				&& !preAccess.equalsIgnoreCase("MOVE")) {
-			System.out.println("Please enter a valid option");
-			preAccess = scanner.next();
-		}
-		scanner.close();
-
-		System.out.println();
-		settings.setPreAceess(wayToDealEnumConverter(preAccess));
-	}
-
-	private static void askForPostaccess() {
-
-		System.out.println("Now choose dealing with post-access errors");
-		System.out.println();
-		System.out.println("Enter 'Ignore' to ignore them.");
-		System.out
-				.println("Enter 'Move' to kill objects at the end of the program.");
-		System.out.println("Enter 'Don't count' not to count these errors");
-		Scanner scanner = new Scanner(System.in);
-		String postAccess = scanner.nextLine();
-		while (!postAccess.equalsIgnoreCase("IGNORE")
-				&& !postAccess.equalsIgnoreCase("MOVE")) {
-			System.out.println("Please enter a valid option");
-			postAccess = scanner.next();
-		}
-		settings.setPostAccess(wayToDealEnumConverter(postAccess));
-		scanner.close();
 	}
 
 	public static WayToDealWithErrors wayToDealEnumConverter(String s) {

@@ -2,8 +2,6 @@ package uk.ac.glasgow.etparser.handlers.EventReporters;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.events.Event;
 import uk.ac.glasgow.etparser.events.Event.Check;
 import uk.ac.glasgow.etparser.handlers.EventHandler;
@@ -60,16 +58,8 @@ public class CountCreation implements EventHandler, EventReport {
 	 */
 	@Override
 	public String finalReport() {
-		// if statistics logger wanted by the user- log the info into the
-		// file...
-		// do the same with all other evert reporters!
-		if (ETParser.getLogger() != null) {
-			ETParser.getLogger()
-					.getLogger()
-					.info((float) created.size() / totalObjectsInHeap
-							* PERCENTAGE
-							+ " % objects were created successfully");
-		}
+
+
 		return (float) created.size() / totalObjectsInHeap * PERCENTAGE
 				+ " % objects were created successfully";
 	}
