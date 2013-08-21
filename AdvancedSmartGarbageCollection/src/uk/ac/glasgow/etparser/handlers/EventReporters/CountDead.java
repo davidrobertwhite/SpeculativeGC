@@ -43,7 +43,7 @@ public class CountDead implements EventHandler, EventReport {
 	 *            an event to be recorded
 	 */
 	@Override
-	public void handle(Event e) {
+	public synchronized void handle(Event e) {
 		if (e.getCheck() != null && e.getCheck().equals(Check.DEAD)) {
 			dead.add(e.getObjectID());
 			// System.out.println("Object with id " + e.getObjectID()

@@ -6,13 +6,21 @@ import java.util.List;
 
 import uk.ac.glasgow.etparser.ObjectStatus;
 
+/**
+ * A Smart heap that deallocates the largest objects first.
+ * 
+ * @author Emi
+ * 
+ */
 public class SmartHeapLargestSize extends SmartHeapComparable {
 
 	public SmartHeapLargestSize() {
 		super();
 		System.out.println("You created a new largestHeap");
 	}
-
+/**
+ * Deallocates the largest allocated objects.
+ */
 	protected void deallocate() {
 		// create a list of objects ordered by the time of last access
 		List<ObjectStatus> timeOrderedObjects = getListOfObjectClassTimeSorted();
@@ -26,7 +34,9 @@ public class SmartHeapLargestSize extends SmartHeapComparable {
 		}
 
 	}
-
+/**
+ * Sorts the objects according to their sizes- from largest to smallest.
+ */
 	@Override
 	protected void sort(List<ObjectStatus> objects) {
 		Collections.sort(objects, new Comparator<ObjectStatus>() {

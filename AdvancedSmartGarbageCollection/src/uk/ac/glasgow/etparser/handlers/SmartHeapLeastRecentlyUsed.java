@@ -5,12 +5,21 @@ import java.util.Comparator;
 import java.util.List;
 import uk.ac.glasgow.etparser.ObjectStatus;
 
+/**
+ * A Smart heap that deallocates the least recently objects first.
+ * 
+ * @author Emi
+ * 
+ */
 public class SmartHeapLeastRecentlyUsed extends SmartHeapComparable {
 	public SmartHeapLeastRecentlyUsed() {
 		super();
 		System.out.println("You created a new LRUHeap");
 	}
 
+	/**
+	 * Deallocate least recently used objects first.
+	 */
 	protected void deallocate() {
 		// create a list of objects ordered by the time of last access
 		List<ObjectStatus> timeOrderedObjects = getListOfObjectClassTimeSorted();
@@ -27,7 +36,11 @@ public class SmartHeapLeastRecentlyUsed extends SmartHeapComparable {
 
 	}
 
-@Override
+	/**
+	 * Sort objects according to the time of last access- from least to most
+	 * recently accessed.
+	 */
+	@Override
 	protected void sort(List<ObjectStatus> objects) {
 		Collections.sort(objects, new Comparator<ObjectStatus>() {
 			public int compare(ObjectStatus o2, ObjectStatus o1) {
@@ -36,7 +49,7 @@ public class SmartHeapLeastRecentlyUsed extends SmartHeapComparable {
 
 			}
 		});
-		
+
 	}
 
 }

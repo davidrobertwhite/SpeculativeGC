@@ -2,9 +2,18 @@ package uk.ac.glasgow.etparser.handlers;
 
 import java.util.Random;
 
+/**
+ * A Smart heap that deallocates objects on a random principle.
+ * 
+ * @author Emi
+ * 
+ */
 public class SmartHeapRandom extends SmartHeap {
 	private Random randomGenerator = new Random();
 
+	/**
+	 * Deallocate randomly selected objects.
+	 */
 	@Override
 	protected void deallocate() {
 		while ((!sizeNormal())) {

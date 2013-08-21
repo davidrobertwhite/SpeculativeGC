@@ -2,9 +2,21 @@ package uk.ac.glasgow.etparser.handlers;
 
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
 
+/**
+ * A factory class for creating SmartHeaps according to the specified heuristic.
+ * 
+ * @author Emi
+ * 
+ */
 public class SmartHeapFactory {
-	
-	public SmartHeap createHeap(Heuristic h){
+	/**
+	 * A method for creating a heap according to our needs.
+	 * 
+	 * @param h
+	 *            the heuristic that determines what heap to be created.
+	 * @return the corresponding heap.
+	 */
+	public SmartHeap createHeap(Heuristic h) {
 		SmartHeap heap;
 		switch (h) {
 		case FIRST:
@@ -33,13 +45,12 @@ public class SmartHeapFactory {
 			heap = new SmartHeapRandom();
 			break;
 		default:
-			heap=null;
+			heap = null;
 			break;
 		}
 
 		return heap;
-		
-		
+
 	}
 
 }

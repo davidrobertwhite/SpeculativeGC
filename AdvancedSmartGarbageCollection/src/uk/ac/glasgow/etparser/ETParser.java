@@ -35,6 +35,9 @@ public class ETParser {
 	 * This variable counts the lines read so far.
 	 */
 	private int lines;
+/**
+ * This is the file that we process.	
+ */
 	private InputStream input;
 
 	/**
@@ -43,14 +46,16 @@ public class ETParser {
 	 * any point of the program.
 	 */
 	private static Heap heap;
+	/**
+	 * Chart representing livesize as a function of time.
+	 */
 	private boolean chart;
 
 	/**
-	 * Constructor initializing the ETParser which takes an InputStream and does
-	 * all its work using the information from the stream.
+	 * Constructor initializing the ETParser which takes an ParameterSetting instance and does
+	 * all its work using the the current settings.
 	 * 
-	 * @param input
-	 *            : the file to be parsed
+	 * @param p the parameters specifying the way the parser to proceed
 	 */
 
 
@@ -75,14 +80,6 @@ public class ETParser {
 		}
 		chart=p.chart();
 
-		if (p.getPreaccess() != null) {
-			heap.setDealWithPreaccess(p.getPreaccess());
-		}
-		if (p.getPostAccess() != null) {
-			heap.setDealWithPostaccess(p.getPostAccess());
-		}
-
-
 		initialiseHandlers();
 
 	}
@@ -94,7 +91,7 @@ public class ETParser {
 	 * it.
 	 */
 
-	public void processFile() {
+	public synchronized void  processFile() {
 		Scanner scanner = new Scanner(input);
 		while (scanner.hasNextLine()) {
 
@@ -107,7 +104,10 @@ public class ETParser {
 		scanner.close();
 
 	}
-
+/**
+ * 
+ * @return the heap representing the current memory.
+ */
 	public static Heap getTheHeap() {
 		return heap;
 	}

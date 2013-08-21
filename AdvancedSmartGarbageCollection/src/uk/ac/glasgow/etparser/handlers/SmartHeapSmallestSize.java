@@ -6,6 +6,12 @@ import java.util.List;
 
 import uk.ac.glasgow.etparser.ObjectStatus;
 
+/**
+ * A Smart heap that deallocates the smallest objects first.
+ * 
+ * @author Emi
+ * 
+ */
 public class SmartHeapSmallestSize extends SmartHeapComparable {
 
 	public SmartHeapSmallestSize() {
@@ -13,6 +19,9 @@ public class SmartHeapSmallestSize extends SmartHeapComparable {
 		System.out.println("You created a new smallestHeap");
 	}
 
+	/**
+	 * Deallocated the smallest objects first.
+	 */
 	protected void deallocate() {
 		// create a list of objects ordered by the time of last access
 		List<ObjectStatus> timeOrderedObjects = getListOfObjectClassTimeSorted();
@@ -28,7 +37,9 @@ public class SmartHeapSmallestSize extends SmartHeapComparable {
 
 	}
 
-
+	/**
+	 * Sort objects according to their sizes- from smallest to largest.
+	 */
 	@Override
 	protected void sort(List<ObjectStatus> objects) {
 		Collections.sort(objects, new Comparator<ObjectStatus>() {
@@ -37,7 +48,7 @@ public class SmartHeapSmallestSize extends SmartHeapComparable {
 
 			}
 		});
-		
+
 	}
 
 }

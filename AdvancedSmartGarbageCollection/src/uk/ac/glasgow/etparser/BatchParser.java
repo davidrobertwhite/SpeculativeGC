@@ -68,11 +68,7 @@ public class BatchParser {
 							ETParser parser = new ETParser(param);
 							ETThread thread=new ETThread(parser,param,outputWriter);
 							addToPool(thread);
-//							parser.processFile();
-//							Results result = new Results(param);
-//							System.out.println(result);
-//							printWriter.println(result.toString());
-//							printWriter.flush();
+
 
 						}
 
@@ -85,12 +81,7 @@ public class BatchParser {
 	
 	
 	private void addToPool(Runnable thread){
-//		if(eventPool.getActiveCount()<eventPool.getMaximumPoolSize()){
-//			eventPool.schedule(thread, 0, TimeUnit.SECONDS);
-//		}
 		eventPool.schedule(thread, 0, TimeUnit.SECONDS);
-		//else: 
-		//wait for 1 thread to finish and then add it.
 	}
 
 

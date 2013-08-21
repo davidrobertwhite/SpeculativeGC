@@ -1,10 +1,17 @@
 package uk.ac.glasgow.etparser.handlers;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import uk.ac.glasgow.etparser.ObjectStatus;
 
+/**
+ * A Smart heap that deallocates the most recently accessed objects first.
+ * 
+ * @author Emi
+ * 
+ */
 public class SmartHeapMostRecentlyUsed extends SmartHeapComparable {
 
 	public SmartHeapMostRecentlyUsed() {
@@ -12,6 +19,9 @@ public class SmartHeapMostRecentlyUsed extends SmartHeapComparable {
 		System.out.println("You created a new MRUHeap");
 	}
 
+	/**
+	 * Deallocate the objects that were most recently used.
+	 */
 	protected void deallocate() {
 		// create a list of objects ordered by the time of last access
 		List<ObjectStatus> timeOrderedObjects = getListOfObjectClassTimeSorted();
@@ -26,7 +36,10 @@ public class SmartHeapMostRecentlyUsed extends SmartHeapComparable {
 
 	}
 
-
+	/**
+	 * Sort objects according to the time of last access- from most recently
+	 * used to least recently used.
+	 */
 	@Override
 	protected void sort(List<ObjectStatus> objects) {
 		Collections.sort(objects, new Comparator<ObjectStatus>() {
@@ -37,8 +50,6 @@ public class SmartHeapMostRecentlyUsed extends SmartHeapComparable {
 			}
 		});
 
-		
 	}
-	
 
 }

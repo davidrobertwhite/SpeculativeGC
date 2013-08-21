@@ -17,6 +17,7 @@ public class ETThread implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		
 		etParser.processFile();
 		Results result = new Results(param);
 		output.write(result);
