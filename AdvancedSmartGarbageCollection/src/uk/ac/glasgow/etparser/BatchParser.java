@@ -1,13 +1,14 @@
 package uk.ac.glasgow.etparser;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
 import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.ParameterSettings;
@@ -22,15 +23,19 @@ public class BatchParser {
 			Heuristic.LEASTRECENTLYUSED, Heuristic.GC, Heuristic.LARGEST,
 			Heuristic.SMALLEST, Heuristic.RANDOM, Heuristic.MOSTRECENTLYUSED,
 			Heuristic.LAST };
-	private FileWriter fileWriter;
-	private PrintWriter printWriter;
+//	private FileWriter fileWriter;
+//	private PrintWriter printWriter;
 	private String csvFile;
 	private HashMap<ParameterSettings, Results> previousResults;
 	private boolean resume;
+	private ScheduledThreadPoolExecutor eventPool; 
+	private ETParserOutputFile outputWriter;
 
 	public BatchParser(String name) throws IOException {
 		csvFile = name;
+		//outputWriter=new ETParserOutputFile(name, false);
 		previousResults = new HashMap<ParameterSettings, Results>();
+		eventPool = new ScheduledThreadPoolExecutor(10);
 
 	}
 
@@ -54,14 +59,20 @@ public class BatchParser {
 								break;
 							}
 						}
+						// have a thread factory and create a new thread that I add to a predefined list of threads.
+						// all this method will do is return the list of threads 
+						//in the main method I invoke addThreadsToPool(List<Threads> l) method 
+					// below the main method I define this method 
 						if (!contains) {
+							//the code for a new thread put into a method/class
 							ETParser parser = new ETParser(param);
-							parser.processFile();
-							Results result = new Results(param);
-							previousResults.put(param, result);
-							System.out.println(result);
-							printWriter.println(result.toString());
-							printWriter.flush();
+							ETThread thread=new ETThread(parser,param,outputWriter);
+							addToPool(thread);
+//							parser.processFile();
+//							Results result = new Results(param);
+//							System.out.println(result);
+//							printWriter.println(result.toString());
+//							printWriter.flush();
 
 						}
 
@@ -71,19 +82,17 @@ public class BatchParser {
 			}
 		}
 	}
-
-	private void addHeader() throws IOException {
-		printWriter.print("Benchmark");
-		printWriter.print(", ");
-		printWriter.print("Heuristic");
-		printWriter.print(", ");
-		printWriter.print("Threshold");
-		printWriter.print(", ");
-		printWriter.print("Percentage");
-		printWriter.print(", ");
-		printWriter.println("Errors");
-
+	
+	
+	private void addToPool(Runnable thread){
+//		if(eventPool.getActiveCount()<eventPool.getMaximumPoolSize()){
+//			eventPool.schedule(thread, 0, TimeUnit.SECONDS);
+//		}
+		eventPool.schedule(thread, 0, TimeUnit.SECONDS);
+		//else: 
+		//wait for 1 thread to finish and then add it.
 	}
+
 
 	public void processFile() throws IOException {
 		File f = new File(csvFile);
@@ -119,25 +128,27 @@ public class BatchParser {
 				}
 
 			} else {
+//				outputWriter.setFile(outputWriter.getFile()+						+ " "
+//						+ new SimpleDateFormat("yyyyMMdd_HHmmss")
+//								.format(Calendar.getInstance().getTime())
+//						+ ".csv");
 				csvFile = csvFile
 						+ " "
 						+ new SimpleDateFormat("yyyyMMdd_HHmmss")
 								.format(Calendar.getInstance().getTime())
 						+ ".csv";
 			}
-			fileWriter = new FileWriter(csvFile, true);
-			printWriter = new PrintWriter(fileWriter);
+			outputWriter=new ETParserOutputFile(csvFile, true);
 		}
 
 		else {
-			fileWriter = new FileWriter(csvFile);
-			printWriter = new PrintWriter(fileWriter);
-			addHeader();
+			outputWriter=new ETParserOutputFile(csvFile, false);
+			//addHeader();
 		}
 
 		doExperiments();
-		printWriter.close();
-		fileWriter.close();
+//		printWriter.close();
+//		fileWriter.close();
 
 	}
 
