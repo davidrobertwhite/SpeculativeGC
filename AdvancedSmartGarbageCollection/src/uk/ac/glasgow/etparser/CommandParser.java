@@ -8,12 +8,21 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+/**
+ * Class for specifying command line arguments and processing them for the
+ * correct working of the program depending on the user's needs.
+ * 
+ * @author Emi
+ * 
+ */
 public class CommandParser {
 
-	public enum WayToDealWithErrors {
-		IGNORE, MOVE
-	};
-
+	/**
+	 * Enum class representing all possible heuristics to test
+	 * 
+	 * @author Emi
+	 * 
+	 */
 	public enum Heuristic {
 		FIRST, LEASTRECENTLYUSED, GC, LARGEST, SMALLEST, RANDOM, MOSTRECENTLYUSED, LAST
 	};
@@ -29,9 +38,6 @@ public class CommandParser {
 		options.addOption("ch", false, "display a livechart");
 		options.addOption("f", true, "input file name");
 		options.addOption("gz", true, "input gz file");
-		options.addOption("unborn", true,
-				"how to deal with unborn accesses: ignore or move");
-		options.addOption("dead", true, "how to deal with dead accesses");
 		options.addOption("h", false, "ask for help");
 		options.addOption(
 				"heuristic",
@@ -63,18 +69,6 @@ public class CommandParser {
 			System.exit(-1);
 		}
 
-
-		if (cmd.hasOption("unborn")) {
-			settings.setPreAceess(wayToDealEnumConverter(cmd
-					.getOptionValue("unborn")));
-		}
-
-		if (cmd.hasOption("dead")) {
-			settings.setPostAccess(wayToDealEnumConverter(cmd
-					.getOptionValue("dead")));
-		}
-
-
 		if (cmd.hasOption("heuristic")) {
 			settings.setHeuristic(heuristicEnumConverter(cmd
 					.getOptionValue("heuristic")));
@@ -97,7 +91,6 @@ public class CommandParser {
 			System.exit(0);
 
 		}
-
 
 		long startOfProcess = System.currentTimeMillis();
 		try {
@@ -137,14 +130,13 @@ public class CommandParser {
 
 	}
 
-	public static WayToDealWithErrors wayToDealEnumConverter(String s) {
-		if (s.equalsIgnoreCase("IGNORE") || s.equalsIgnoreCase("i")) {
-			return WayToDealWithErrors.IGNORE;
-		} else if (s.equalsIgnoreCase("MOVE") || s.equalsIgnoreCase("m")) {
-			return WayToDealWithErrors.MOVE;
-		}
-		return null;
-	}
+	/**
+	 * Method for conversion of Strings to enum Heuristic.
+	 * 
+	 * @param s
+	 *            string to be converted into it's enum equivalent of heuristic
+	 * @return
+	 */
 
 	public static Heuristic heuristicEnumConverter(String s) {
 		if (s.equalsIgnoreCase("first") || s.equalsIgnoreCase("fifo")) {

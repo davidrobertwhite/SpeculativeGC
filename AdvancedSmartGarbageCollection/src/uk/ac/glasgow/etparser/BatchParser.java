@@ -13,32 +13,83 @@ import uk.ac.glasgow.etparser.CommandParser.Heuristic;
 import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.ParameterSettings;
 
+/**
+ * Class for testing heuristics. Outputs the results to a specified file for
+ * further analysis.
+ * 
+ * @author Emi
+ * 
+ */
 public class BatchParser {
-
+	/**
+	 * Thresholds to be tested, in other words- the size of the memory
+	 */
 	private int[] thresholds = { 50000, 75000, 100000, 125000, 150000, 175000,
 			200000 };
+	/**
+	 * Percentage of the memory size to deallocate after the specified threshold
+	 * has been reached.
+	 */
 	private int[] percentage = { 5, 10, 15, 20, 25, 30, 50, 100 };
+	/**
+	 * Files to be tested
+	 */
 	private String[] files = { "C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz" };
+	/**
+	 * Array of heuristics to be tested.
+	 */
 	private Heuristic[] heuristics = { Heuristic.FIRST,
 			Heuristic.LEASTRECENTLYUSED, Heuristic.GC, Heuristic.LARGEST,
 			Heuristic.SMALLEST, Heuristic.RANDOM, Heuristic.MOSTRECENTLYUSED,
 			Heuristic.LAST };
-//	private FileWriter fileWriter;
-//	private PrintWriter printWriter;
+	// private FileWriter fileWriter;
+	// private PrintWriter printWriter;
+	/**
+	 * The file in whech the results will be printed.
+	 */
 	private String csvFile;
+	/**
+	 * Hash map storing existing results in the specified output file if the
+	 * resume mode is on, i.e. if the user chose that he wants to resume an
+	 * already existing file this hashmap stores the results already found in
+	 * the file.
+	 */
 	private HashMap<ParameterSettings, Results> previousResults;
+	/**
+	 * Specifies whether the user wants to resume writing to an already existing
+	 * file or create a new one.
+	 */
 	private boolean resume;
-	private ScheduledThreadPoolExecutor eventPool; 
+	/**
+	 * Event pool for scheduling the threads to execute.
+	 */
+	private ScheduledThreadPoolExecutor eventPool;
+	/**
+	 * Holds the name of the file to which to send the results.
+	 */
 	private ETParserOutputFile outputWriter;
 
+	/**
+	 * Constructor initialising the BatchParser
+	 * 
+	 * @param name
+	 *            of the file to which to send the results
+	 * @throws IOException
+	 */
 	public BatchParser(String name) throws IOException {
 		csvFile = name;
-		//outputWriter=new ETParserOutputFile(name, false);
+		// outputWriter=new ETParserOutputFile(name, false);
 		previousResults = new HashMap<ParameterSettings, Results>();
 		eventPool = new ScheduledThreadPoolExecutor(10);
 
 	}
 
+	/**
+	 * Do all the experiments, creating threads for all experiments and output
+	 * to the specified file.
+	 * 
+	 * @throws IOException
+	 */
 	public void doExperiments() throws IOException {
 
 		for (String file : files) {
@@ -59,16 +110,17 @@ public class BatchParser {
 								break;
 							}
 						}
-						// have a thread factory and create a new thread that I add to a predefined list of threads.
-						// all this method will do is return the list of threads 
-						//in the main method I invoke addThreadsToPool(List<Threads> l) method 
-					// below the main method I define this method 
+						// have a thread factory and create a new thread that I
+						// add to a predefined list of threads.
+						// all this method will do is return the list of threads
+						// in the main method I invoke
+						// addThreadsToPool(List<Threads> l) method
+						// below the main method I define this method
 						if (!contains) {
-							//the code for a new thread put into a method/class
-							ETParser parser = new ETParser(param);
-							ETThread thread=new ETThread(parser,param,outputWriter);
+							// the code for a new thread put into a method/class
+							ETThread thread = new ETThread(param,
+									outputWriter);
 							addToPool(thread);
-
 
 						}
 
@@ -78,13 +130,23 @@ public class BatchParser {
 			}
 		}
 	}
-	
-	
-	private void addToPool(Runnable thread){
+
+	/**
+	 * Schedule a new thread to the eventPool.
+	 * 
+	 * @param thread
+	 *            the thread to be scheduled
+	 */
+	private void addToPool(Runnable thread) {
 		eventPool.schedule(thread, 0, TimeUnit.SECONDS);
 	}
 
-
+	/**
+	 * Determines whether the file exists depending on this it processes it in
+	 * the specified by the user way.
+	 * 
+	 * @throws IOException
+	 */
 	public void processFile() throws IOException {
 		File f = new File(csvFile);
 
@@ -119,34 +181,48 @@ public class BatchParser {
 				}
 
 			} else {
-//				outputWriter.setFile(outputWriter.getFile()+						+ " "
-//						+ new SimpleDateFormat("yyyyMMdd_HHmmss")
-//								.format(Calendar.getInstance().getTime())
-//						+ ".csv");
+				// outputWriter.setFile(outputWriter.getFile()+ + " "
+				// + new SimpleDateFormat("yyyyMMdd_HHmmss")
+				// .format(Calendar.getInstance().getTime())
+				// + ".csv");
 				csvFile = csvFile
 						+ " "
 						+ new SimpleDateFormat("yyyyMMdd_HHmmss")
 								.format(Calendar.getInstance().getTime())
 						+ ".csv";
 			}
-			outputWriter=new ETParserOutputFile(csvFile, true);
+			outputWriter = new ETParserOutputFile(csvFile, true);
 		}
 
 		else {
-			outputWriter=new ETParserOutputFile(csvFile, false);
-			//addHeader();
+			outputWriter = new ETParserOutputFile(csvFile, false);
+			// addHeader();
 		}
 
 		doExperiments();
-//		printWriter.close();
-//		fileWriter.close();
+		// printWriter.close();
+		// fileWriter.close();
 
 	}
 
+	/**
+	 * Specify that you want to resume writing results to an existing file.
+	 * 
+	 * @param r
+	 *            true if you want to resume writing to the existing file
+	 */
 	public void setResume(boolean r) {
 		resume = r;
 	}
 
+	/**
+	 * Checks whether the header of the existing file is the same as desired for
+	 * making sure that we are writing to the correct file.
+	 * 
+	 * @param s
+	 *            the header of the existing file
+	 * @return true if the file is in the correct format
+	 */
 	private boolean headerCorrect(String s) {
 		Scanner scan = new Scanner(s);
 		scan.useDelimiter(", ");

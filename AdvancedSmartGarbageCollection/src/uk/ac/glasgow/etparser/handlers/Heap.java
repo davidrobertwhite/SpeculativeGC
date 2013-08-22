@@ -2,7 +2,6 @@ package uk.ac.glasgow.etparser.handlers;
 
 import java.util.HashMap;
 import uk.ac.glasgow.etparser.ObjectStatus;
-import uk.ac.glasgow.etparser.CommandParser.WayToDealWithErrors;
 import uk.ac.glasgow.etparser.events.Event;
 import uk.ac.glasgow.etparser.events.Event.Check;
 import uk.ac.glasgow.etparser.events.Event.TypeOfEvent;
@@ -45,11 +44,7 @@ public class Heap implements EventHandler {
 	 * the object has been deallocated.
 	 */
 	protected int allocatedMemSize;
-	/**
-	 * The way to deal with trying to access objects that haven't been allocated
-	 * in memory yet.
-	 */
-	protected WayToDealWithErrors dealWithPreaccess;
+
 
 	/**
 	 * Initializes the class variables.
