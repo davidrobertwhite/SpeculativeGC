@@ -16,7 +16,7 @@ public abstract class SmartHeap extends Heap {
 	 * The limit of allocated memory in megabytes to reach before starting to
 	 * deallocate objects.
 	 */
-	protected int threshold; // default would be 70000 for now unless
+	protected int threshold; // default would be 30 mb for now unless
 								// otherwise specified
 	/**
 	 * What percentage of the currently allocated objects to deallocate after

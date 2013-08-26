@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
-import uk.ac.glasgow.etparser.ETParser;
 import uk.ac.glasgow.etparser.ParameterSettings;
 
 /**
@@ -42,8 +40,7 @@ public class BatchParser {
 			Heuristic.LEASTRECENTLYUSED, Heuristic.GC, Heuristic.LARGEST,
 			Heuristic.SMALLEST, Heuristic.RANDOM, Heuristic.MOSTRECENTLYUSED,
 			Heuristic.LAST };
-	// private FileWriter fileWriter;
-	// private PrintWriter printWriter;
+
 	/**
 	 * The file in whech the results will be printed.
 	 */
@@ -78,9 +75,8 @@ public class BatchParser {
 	 */
 	public BatchParser(String name) throws IOException {
 		csvFile = name;
-		// outputWriter=new ETParserOutputFile(name, false);
 		previousResults = new HashMap<ParameterSettings, Results>();
-		eventPool = new ScheduledThreadPoolExecutor(10);
+		eventPool = new ScheduledThreadPoolExecutor(1);
 
 	}
 
@@ -181,10 +177,7 @@ public class BatchParser {
 				}
 
 			} else {
-				// outputWriter.setFile(outputWriter.getFile()+ + " "
-				// + new SimpleDateFormat("yyyyMMdd_HHmmss")
-				// .format(Calendar.getInstance().getTime())
-				// + ".csv");
+
 				csvFile = csvFile
 						+ " "
 						+ new SimpleDateFormat("yyyyMMdd_HHmmss")
@@ -196,12 +189,10 @@ public class BatchParser {
 
 		else {
 			outputWriter = new ETParserOutputFile(csvFile, false);
-			// addHeader();
 		}
 
 		doExperiments();
-		// printWriter.close();
-		// fileWriter.close();
+
 
 	}
 

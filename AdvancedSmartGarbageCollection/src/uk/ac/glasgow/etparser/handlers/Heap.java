@@ -322,5 +322,8 @@ public class Heap implements EventHandler {
 
 		return memory;
 	}
+	public int numberOfTotalObjects(){
+		return everSeen.size();
+	}
 
 }

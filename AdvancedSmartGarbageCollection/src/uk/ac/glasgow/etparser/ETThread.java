@@ -49,7 +49,7 @@ public class ETThread implements Runnable {
 	public void run() {
 
 		etParser.processFile();
-		Results result = new Results(param);
+		Results result = new Results(param,etParser.getErrorCount());
 		output.write(result);
 
 	}

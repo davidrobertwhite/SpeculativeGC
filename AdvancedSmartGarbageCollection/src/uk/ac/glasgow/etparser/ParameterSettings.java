@@ -52,6 +52,9 @@ public class ParameterSettings {
 		this.percentage = percentage;
 	}
 
+	/**
+	 * Default constructor.
+	 */
 	public ParameterSettings() {
 
 	}

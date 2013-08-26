@@ -13,12 +13,16 @@ import uk.ac.glasgow.etparser.handlers.EventHandler;
  * @version 1.0
  * 
  */
-public class CountDead implements EventHandler, EventReport {
+public class CountDead implements EventHandler {
+	/**
+	 * Used for calculating the result as a percentage.
+	 */
+	public static final int PERCENTAGE = 100;
 
 	/**
 	 * Set of all objects accessed after their death.
 	 */
-	private static Set<String> dead;
+	private Set<String> dead;
 
 	/**
 	 * Initializes the empty set of accessed dead objects.
@@ -53,17 +57,14 @@ public class CountDead implements EventHandler, EventReport {
 	}
 
 	/**
-	 * Gives a final report of what percentage of total objects were accessed
-	 * after their death.
+	 * A method for calculating the percentage of objects that caused dead
+	 * error.
+	 * 
+	 * @param totalObjectsInHeap
+	 *            the total objects ever seen by the program
+	 * @return the percentage of objects that caused dead error
 	 */
-	@Override
-	public String finalReport() {
-
-		return (float) dead.size() / totalObjectsInHeap * PERCENTAGE
-				+ " % objects cause dead error";
-	}
-	
-	public static float getErrors(){
+	public float getErrors(int totalObjectsInHeap) {
 		return (float) dead.size() / totalObjectsInHeap * PERCENTAGE;
 	}
 

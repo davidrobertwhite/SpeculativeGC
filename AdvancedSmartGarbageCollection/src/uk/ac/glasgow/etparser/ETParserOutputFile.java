@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Crass encapsulating the file to which results to be written.
+ * Class encapsulating the file to which results to be written.
  * 
  * @author Emi
  * 

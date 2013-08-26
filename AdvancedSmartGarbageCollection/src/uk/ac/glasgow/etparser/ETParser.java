@@ -10,12 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 import uk.ac.glasgow.etparser.events.*;
 import uk.ac.glasgow.etparser.handlers.*;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountCreation;
 import uk.ac.glasgow.etparser.handlers.EventReporters.CountDead;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountLegal;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountMultipleCreations;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountNotBorn;
-import uk.ac.glasgow.etparser.handlers.EventReporters.EventReport;
 
 /**
  * This class parses a file into lines, keeps a list of event handlers and every
@@ -35,9 +30,13 @@ public class ETParser {
 	 * This variable counts the lines read so far.
 	 */
 	private int lines;
-/**
- * This is the file that we process.	
- */
+	/**
+	 * Counter for dead errors.
+	 */
+	private CountDead dead;
+	/**
+	 * This is the file that we process.
+	 */
 	private InputStream input;
 
 	/**
@@ -45,20 +44,19 @@ public class ETParser {
 	 * allocated and also keeps track of all the objects tried to be accessed at
 	 * any point of the program.
 	 */
-	private static Heap heap;
+	private Heap heap;
 	/**
 	 * Chart representing livesize as a function of time.
 	 */
 	private boolean chart;
 
 	/**
-	 * Constructor initializing the ETParser which takes an ParameterSetting instance and does
-	 * all its work using the the current settings.
+	 * Constructor initializing the ETParser which takes an ParameterSetting
+	 * instance and does all its work using the the current settings.
 	 * 
-	 * @param p the parameters specifying the way the parser to proceed
+	 * @param p
+	 *            the parameters specifying the way the parser to proceed
 	 */
-
-
 
 	public ETParser(ParameterSettings p) throws FileNotFoundException,
 			IOException {
@@ -78,12 +76,11 @@ public class ETParser {
 		} else {
 			heap = new Heap();
 		}
-		chart=p.chart();
+		chart = p.chart();
 
 		initialiseHandlers();
 
 	}
-
 
 	/**
 	 * 
@@ -91,7 +88,7 @@ public class ETParser {
 	 * it.
 	 */
 
-	public synchronized void  processFile() {
+	public synchronized void processFile() {
 		Scanner scanner = new Scanner(input);
 		while (scanner.hasNextLine()) {
 
@@ -104,11 +101,12 @@ public class ETParser {
 		scanner.close();
 
 	}
-/**
- * 
- * @return the heap representing the current memory.
- */
-	public static Heap getTheHeap() {
+
+	/**
+	 * 
+	 * @return the heap representing the current memory.
+	 */
+	public Heap getTheHeap() {
 		return heap;
 	}
 
@@ -142,38 +140,32 @@ public class ETParser {
 	}
 
 	/**
-	 * All handlers instances of EventReport interface print their final report
-	 * for statistics.
-	 */
-	public void printReport() {
-		for (EventHandler eh : handlers) {
-			if (eh instanceof EventReport) {
-				System.out.println(((EventReport) eh).finalReport());
-
-			}
-
-		}
-	}
-
-	/**
 	 * Adds to the list of handlers all necessary EventHandlers for the program.
 	 */
 	public void initialiseHandlers() {
 		registerHandler(heap);
-		EventHandler notBorns = new CountNotBorn();
-		registerHandler(notBorns);
-		EventHandler creation = new CountCreation();
-		registerHandler(creation);
-		EventHandler legal = new CountLegal();
-		registerHandler(legal);
-		EventHandler multiple = new CountMultipleCreations();
-		registerHandler(multiple);
-		EventHandler dead = new CountDead();
+		dead = new CountDead();
 		registerHandler(dead);
-		LiveSizeChart ch=new LiveSizeChart(heap);
+		LiveSizeChart ch = new LiveSizeChart(heap);
 		ch.setVisible(chart);
 		registerHandler(ch);
 
+	}
+
+	/**
+	 * 
+	 * @return the registered CountDead instance
+	 */
+	public CountDead getDead() {
+		return dead;
+	}
+
+	/**
+	 * 
+	 * @return the percentage of objects that cause dead error
+	 */
+	public float getErrorCount() {
+		return dead.getErrors(heap.numberOfTotalObjects());
 	}
 
 	/**
@@ -183,6 +175,14 @@ public class ETParser {
 	 */
 	public List<EventHandler> getHandlers() {
 		return handlers;
+	}
+
+	/**
+	 * prints the final report from a single test to the console
+	 */
+	public void printReport() {
+		System.out.println("% objects that caused postacess errors is %.2f"
+				+ getErrorCount());
 	}
 
 }

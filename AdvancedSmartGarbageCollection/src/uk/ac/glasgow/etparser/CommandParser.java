@@ -36,7 +36,6 @@ public class CommandParser {
 		// Second parameter is whether this is a switch or argument
 		// Third is a description
 		options.addOption("ch", false, "display a livechart");
-		options.addOption("f", true, "input file name");
 		options.addOption("gz", true, "input gz file");
 		options.addOption("h", false, "ask for help");
 		options.addOption(
@@ -95,10 +94,6 @@ public class CommandParser {
 		long startOfProcess = System.currentTimeMillis();
 		try {
 
-			if (cmd.hasOption("f")) {
-				settings.setFile(cmd.getOptionValue("f"));
-
-			}
 
 			if (cmd.hasOption("gz")) {
 				settings.setFile(cmd.getOptionValue("gz"));

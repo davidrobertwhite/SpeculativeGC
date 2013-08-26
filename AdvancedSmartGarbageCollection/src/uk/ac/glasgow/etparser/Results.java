@@ -1,7 +1,7 @@
 package uk.ac.glasgow.etparser;
 
 import uk.ac.glasgow.etparser.CommandParser.Heuristic;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountDead;
+
 /**
  * A class encapsulating the results from a current test.
  * @author Emi
@@ -29,18 +29,6 @@ public class Results {
 	 */
 	private float errors;
 
-/**
- * 
- * @param p parameters with which the tests were executed
- */
-
-	public Results(ParameterSettings p) {
-		benchmark = p.getFile();
-		heuristic = p.getHeuristic();
-		threshold = p.getThreshold();
-		percentage = p.getPercentage();
-		errors = CountDead.getErrors();
-	}
 	/**
 	 * 
 	 * @param p parameters with which the tests were executed
