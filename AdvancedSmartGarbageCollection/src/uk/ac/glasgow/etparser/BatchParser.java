@@ -76,7 +76,7 @@ public class BatchParser {
 	public BatchParser(String name) throws IOException {
 		csvFile = name;
 		previousResults = new HashMap<ParameterSettings, Results>();
-		eventPool = new ScheduledThreadPoolExecutor(1);
+		eventPool = new ScheduledThreadPoolExecutor(10);
 
 	}
 

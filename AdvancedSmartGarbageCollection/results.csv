@@ -1,0 +1,6 @@
+Benchmark, Heuristic, Threshold, Percentage, Errors
+C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz, FIRST, 50000, 5.0, 23.632612
+C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz, FIRST, 50000, 10.0, 24.767801
+C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz, FIRST, 50000, 15.0, 25.799793
+C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz, FIRST, 50000, 20.0, 26.934984
+C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz, FIRST, 50000, 25.0, 27.966976
