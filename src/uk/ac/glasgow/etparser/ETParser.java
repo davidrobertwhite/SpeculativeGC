@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 import uk.ac.glasgow.etparser.events.*;
 import uk.ac.glasgow.etparser.handlers.*;
-import uk.ac.glasgow.etparser.handlers.EventReporters.CountDead;
+import uk.ac.glasgow.etparser.handlers.reporters.CountDead;
 
 /**
  * This class parses a file into lines, keeps a list of event handlers and every

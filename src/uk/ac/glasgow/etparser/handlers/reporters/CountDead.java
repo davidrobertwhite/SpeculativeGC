@@ -1,4 +1,4 @@
-package uk.ac.glasgow.etparser.handlers.EventReporters;
+package uk.ac.glasgow.etparser.handlers.reporters;
 
 import java.util.HashSet;
 import java.util.Set;
