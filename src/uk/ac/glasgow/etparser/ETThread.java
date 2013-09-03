@@ -33,8 +33,7 @@ public class ETThread implements Runnable {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public ETThread(ParameterSettings p, ETParserOutputFile output)
-			throws FileNotFoundException, IOException {
+	public ETThread(ParameterSettings p, ETParserOutputFile output)  {
 		etParser = new ETParser(p);
 		param = p;
 		this.output = output;

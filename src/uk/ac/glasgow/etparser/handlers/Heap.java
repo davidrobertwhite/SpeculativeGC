@@ -55,8 +55,6 @@ public class Heap implements EventHandler {
 		timeSequence = 0;
 		memory = new HashMap<String, ObjectStatus>();
 		everSeen = new HashMap<String, ObjectStatus>();
-		System.out.println("You created a new Heap");
-
 	}
 
 	/**

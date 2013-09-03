@@ -1,6 +1,6 @@
 package uk.ac.glasgow.etparser;
 
-import uk.ac.glasgow.etparser.CommandParser.Heuristic;
+import uk.ac.glasgow.etparser.SimulateGC.Heuristic;
 
 /**
  * A class encapsulating the results from a current test.

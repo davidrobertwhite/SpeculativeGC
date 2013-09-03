@@ -1,6 +1,6 @@
 package uk.ac.glasgow.etparser;
 
-import uk.ac.glasgow.etparser.CommandParser.Heuristic;
+import uk.ac.glasgow.etparser.SimulateGC.Heuristic;
 
 /**
  * A class specifying the user's needs on what they want to test.
@@ -33,6 +33,17 @@ public class ParameterSettings {
 	 */
 	private Heuristic heuristic;
 
+	/**
+	 * Return string representation of the main parameters in this object.
+	 * @return String including line breaks.
+	 */
+	public String toString() {
+		String input = "Filename: " + inputFile + "\n";
+		String t = "Threshold: " + threshold + "MB\n";
+		String p = "Percentage: " + percentage + "%\n";
+		return input + t + p;
+	}
+	
 	/**
 	 * 
 	 * @param file

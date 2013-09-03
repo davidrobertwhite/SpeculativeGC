@@ -47,8 +47,6 @@ public abstract class SmartHeap extends Heap {
 	 */
 	public void specifyThreshold(int t) {
 		threshold = t;
-		System.out.println("threshold is " + threshold);
-
 	}
 
 	/**
@@ -60,7 +58,6 @@ public abstract class SmartHeap extends Heap {
 
 	public void specifyPercentageToDeallocate(int p) {
 		percentageToDeallocate = p / 100.0;
-		System.out.println("percentage is " + percentageToDeallocate);
 	}
 
 	/**

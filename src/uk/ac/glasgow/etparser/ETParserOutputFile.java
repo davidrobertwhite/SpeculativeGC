@@ -29,8 +29,15 @@ public class ETParserOutputFile {
 	 *            ones
 	 * @throws IOException
 	 */
-	public ETParserOutputFile(String file, boolean append) throws IOException {
-		fileWriter = new FileWriter(file, append);
+	public ETParserOutputFile(String file, boolean append) {
+		// May not need this @drw - just put it in whilst working on other code
+		try {
+			fileWriter = new FileWriter(file, append);
+		} catch (Exception e) {
+			System.err.println("Error writing to output file: " + e);
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		printWriter = new PrintWriter(fileWriter);
 		addHeader();
 	}
@@ -40,7 +47,7 @@ public class ETParserOutputFile {
 	 * 
 	 * @throws IOException
 	 */
-	private void addHeader() throws IOException {
+	private void addHeader() {
 		printWriter.print("Benchmark");
 		printWriter.print(", ");
 		printWriter.print("Heuristic");

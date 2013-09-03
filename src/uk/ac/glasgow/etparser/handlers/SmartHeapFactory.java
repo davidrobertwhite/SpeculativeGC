@@ -1,6 +1,6 @@
 package uk.ac.glasgow.etparser.handlers;
 
-import uk.ac.glasgow.etparser.CommandParser.Heuristic;
+import uk.ac.glasgow.etparser.SimulateGC.Heuristic;
 
 /**
  * A factory class for creating SmartHeaps according to the specified heuristic.
@@ -22,7 +22,7 @@ public class SmartHeapFactory {
 		case FIRST:
 			heap = new SmartHeapFIFO();
 			break;
-		case LEASTRECENTLYUSED:
+		case LRU:
 			heap = new SmartHeapLeastRecentlyUsed();
 			break;
 		case GC:
@@ -32,7 +32,7 @@ public class SmartHeapFactory {
 		case LAST:
 			heap = new SmartHeapLIFO();
 			break;
-		case MOSTRECENTLYUSED:
+		case MRU:
 			heap = new SmartHeapMostRecentlyUsed();
 			break;
 		case SMALLEST:

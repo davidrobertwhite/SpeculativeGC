@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import uk.ac.glasgow.etparser.CommandParser.Heuristic;
+import uk.ac.glasgow.etparser.SimulateGC.Heuristic;
 import uk.ac.glasgow.etparser.ParameterSettings;
 
 /**
@@ -18,7 +18,7 @@ import uk.ac.glasgow.etparser.ParameterSettings;
  * @author Emi
  * 
  */
-public class BatchParser {
+public class BatchExperiment {
 	/**
 	 * Thresholds to be tested, in other words- the size of the memory
 	 */
@@ -33,16 +33,10 @@ public class BatchParser {
 	 * Files to be tested
 	 */
 	private String[] files = { "C://Users//Emi//Desktop//traces//ET0.6//java-mandelbrot_500.trace.gz" };
-	/**
-	 * Array of heuristics to be tested.
-	 */
-	private Heuristic[] heuristics = { Heuristic.FIRST,
-			Heuristic.LEASTRECENTLYUSED, Heuristic.GC, Heuristic.LARGEST,
-			Heuristic.SMALLEST, Heuristic.RANDOM, Heuristic.MOSTRECENTLYUSED,
-			Heuristic.LAST };
+
 
 	/**
-	 * The file in whech the results will be printed.
+	 * The file in which the results will be printed.
 	 */
 	private String csvFile;
 	/**
@@ -73,7 +67,7 @@ public class BatchParser {
 	 *            of the file to which to send the results
 	 * @throws IOException
 	 */
-	public BatchParser(String name) throws IOException {
+	public BatchExperiment(String name) {
 		csvFile = name;
 		previousResults = new HashMap<ParameterSettings, Results>();
 		eventPool = new ScheduledThreadPoolExecutor(10);
@@ -86,11 +80,11 @@ public class BatchParser {
 	 * 
 	 * @throws IOException
 	 */
-	public void doExperiments() throws IOException {
+	public void doExperiments() {
 
 		for (String file : files) {
 			System.out.println(file);
-			for (Heuristic h : heuristics) {
+			for (Heuristic h : SimulateGC.Heuristic.values()) {
 				System.out.println(h);
 				for (int threshold : thresholds) {
 					System.out.println(threshold);
@@ -114,8 +108,7 @@ public class BatchParser {
 						// below the main method I define this method
 						if (!contains) {
 							// the code for a new thread put into a method/class
-							ETThread thread = new ETThread(param,
-									outputWriter);
+							ETThread thread = new ETThread(param,outputWriter);
 							addToPool(thread);
 
 						}
@@ -143,12 +136,20 @@ public class BatchParser {
 	 * 
 	 * @throws IOException
 	 */
-	public void processFile() throws IOException {
+	public void processFile() {
 		File f = new File(csvFile);
 
 		if (f.exists()) {
 			if (resume) {
-				Scanner scan = new Scanner(f);
+				
+				Scanner scan= null;
+				try {
+					scan = new Scanner(f);
+				} catch (Exception e) {
+					System.err.println("Error scanning output file " + e);
+					e.printStackTrace();
+					System.exit(-1);
+				}
 
 				if (scan.hasNextLine() && headerCorrect(scan.nextLine())) {
 					System.out.println("header");
@@ -158,9 +159,7 @@ public class BatchParser {
 						lineScanner.useDelimiter(", ");
 						ParameterSettings p = new ParameterSettings(
 								lineScanner.next(),
-								CommandParser
-										.heuristicEnumConverter(lineScanner
-												.next()),
+								SimulateGC.Heuristic.valueOf(lineScanner.next()),
 								Integer.parseInt(lineScanner.next()),
 								(int) Double.parseDouble(lineScanner.next()));
 

@@ -22,6 +22,12 @@ import uk.ac.glasgow.etparser.handlers.reporters.CountDead;
  * @version 1.0
  */
 public class ETParser {
+	
+	/**
+	 * Name of ET file to be read as input.
+	 */
+	private String inputFilename;
+	
 	/**
 	 * List of registered objects to handle events.
 	 */
@@ -34,11 +40,7 @@ public class ETParser {
 	 * Counter for dead errors.
 	 */
 	private CountDead dead;
-	/**
-	 * This is the file that we process.
-	 */
-	private InputStream input;
-
+	
 	/**
 	 * This heap is analogous to the memory. It contains all the objects
 	 * allocated and also keeps track of all the objects tried to be accessed at
@@ -58,10 +60,10 @@ public class ETParser {
 	 *            the parameters specifying the way the parser to proceed
 	 */
 
-	public ETParser(ParameterSettings p) throws FileNotFoundException,
-			IOException {
-		this.input = new GZIPInputStream(new FileInputStream(p.getFile()));
-		;
+	public ETParser(ParameterSettings p) {
+		
+		inputFilename = p.getFile();
+		
 		handlers = new ArrayList<EventHandler>();
 		lines = 0;
 		SmartHeapFactory factory = new SmartHeapFactory();
@@ -89,6 +91,17 @@ public class ETParser {
 	 */
 
 	public synchronized void processFile() {
+		
+		GZIPInputStream input = null;
+		
+		try {
+			input = new GZIPInputStream(new FileInputStream(inputFilename));
+		} catch (Exception e) {
+			System.err.println("Error opening input file: " + e);
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
 		Scanner scanner = new Scanner(input);
 		while (scanner.hasNextLine()) {
 
