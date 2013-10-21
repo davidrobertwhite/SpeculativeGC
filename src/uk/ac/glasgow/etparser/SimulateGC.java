@@ -84,7 +84,7 @@ public class SimulateGC {
 			etparser.printReport();
 			
 			long endOfProcess = System.currentTimeMillis();
-			long timeTaken = endOfProcess - startOfProcess / 1000;
+			double timeTaken = ((double)endOfProcess - startOfProcess) / 1000;
 			System.out.println("Time taken " + timeTaken + " seconds.");
 			
 		}

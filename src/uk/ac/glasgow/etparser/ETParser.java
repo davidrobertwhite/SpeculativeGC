@@ -47,10 +47,6 @@ public class ETParser {
 	 * any point of the program.
 	 */
 	private Heap heap;
-	/**
-	 * Chart representing livesize as a function of time.
-	 */
-	private boolean chart;
 
     /**
      * Report progress after a certain number of events processed.
@@ -88,7 +84,7 @@ public class ETParser {
 		} else {
 			heap = new Heap();
 		}
-		chart = p.chart();
+
         reportInterval = p.getCounterInterval();
 
 		initialiseHandlers();
@@ -174,10 +170,6 @@ public class ETParser {
 		registerHandler(heap);
 		dead = new CountDead();
 		registerHandler(dead);
-		LiveSizeChart ch = new LiveSizeChart(heap);
-		ch.setVisible(chart);
-		registerHandler(ch);
-
 	}
 
 	/**
@@ -209,8 +201,7 @@ public class ETParser {
 	 * prints the final report from a single test to the console
 	 */
 	public void printReport() {
-		System.out.println("% objects that caused postacess errors is %.2f"
-				+ getErrorCount());
+		System.out.println("Percentage of objects that caused postacess errors is " + getErrorCount());
 	}
 
 }
