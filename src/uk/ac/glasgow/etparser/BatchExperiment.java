@@ -92,7 +92,7 @@ public class BatchExperiment {
 						System.out.println(p);
 
 						ParameterSettings param = new ParameterSettings(file,
-								h, threshold, p);
+								h, threshold, p, 0);
 						boolean contains = false;
 						for (ParameterSettings ps : previousResults.keySet()) {
 							if (ps.equals(param)) {
@@ -161,7 +161,7 @@ public class BatchExperiment {
 								lineScanner.next(),
 								SimulateGC.Heuristic.valueOf(lineScanner.next()),
 								Integer.parseInt(lineScanner.next()),
-								(int) Double.parseDouble(lineScanner.next()));
+								(int) Double.parseDouble(lineScanner.next()),0);
 
 						Results r = new Results(p, Float.parseFloat(lineScanner
 								.next()));

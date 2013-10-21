@@ -52,6 +52,16 @@ public class ETParser {
 	 */
 	private boolean chart;
 
+    /**
+     * Report progress after a certain number of events processed.
+     */
+    private int reportInterval = 0;
+
+    /*
+        Last time progress was output to stdout.
+     */
+    private long lastReport = 0;
+
 	/**
 	 * Constructor initializing the ETParser which takes an ParameterSetting
 	 * instance and does all its work using the the current settings.
@@ -79,6 +89,7 @@ public class ETParser {
 			heap = new Heap();
 		}
 		chart = p.chart();
+        reportInterval = p.getCounterInterval();
 
 		initialiseHandlers();
 
@@ -107,6 +118,10 @@ public class ETParser {
 
 			String nextLine = scanner.nextLine();
 			lines++;
+            if ((lines - lastReport) % reportInterval == 0) {
+                System.out.println("Processed: " + lines + " lines");
+                lastReport = lines;
+            }
 			Event event = new Event(nextLine);
 			notifyHandlers(event);
 

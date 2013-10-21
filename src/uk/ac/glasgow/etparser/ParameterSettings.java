@@ -33,6 +33,12 @@ public class ParameterSettings {
 	 */
 	private Heuristic heuristic;
 
+    /**
+     * Counter to report progress every n events.
+     * Default of zero means no progress reports.
+     */
+    private int counterInterval = 0;
+
 	/**
 	 * Return string representation of the main parameters in this object.
 	 * @return String including line breaks.
@@ -41,7 +47,8 @@ public class ParameterSettings {
 		String input = "Filename: " + inputFile + "\n";
 		String t = "Threshold: " + threshold + "MB\n";
 		String p = "Percentage: " + percentage + "%\n";
-		return input + t + p;
+        String c = "Counter: " + counterInterval + "\n";
+		return input + t + p + c;
 	}
 	
 	/**
@@ -56,11 +63,12 @@ public class ParameterSettings {
 	 *            of objects to deallocated once the threshold has been reached
 	 */
 	public ParameterSettings(String file, Heuristic h, int threshold,
-			int percentage) {
+			int percentage,int counter) {
 		heuristic = h;
 		inputFile = file;
 		this.threshold = threshold;
 		this.percentage = percentage;
+        this.counterInterval = counter;
 	}
 
 	/**
@@ -153,6 +161,21 @@ public class ParameterSettings {
 	public void setPercentage(int p) {
 		percentage = p;
 	}
+
+    /**
+     * Set the interval at which to report progress, in terms of the number of events processed.
+     * @param c Report progress every c events.
+     */
+    public void setCounterInterval(int c) {
+        this.counterInterval = c;
+    }
+
+    /* Retrieve the interval at which progress is reported, in terms of events processed.
+     @return the number of events between progress reports
+     */
+    public int getCounterInterval() {
+        return this.counterInterval;
+    }
 
 	/**
 	 * 

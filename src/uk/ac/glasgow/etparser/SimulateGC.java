@@ -40,6 +40,8 @@ public class SimulateGC {
 	private static String THRESHOLD_LONG = "threshold";
 	private static String DELETION_SHORT = "d";
 	private static String DELETION_LONG = "deletion";
+    private static String COUNTER_LONG = "report_interval";
+
 
 	public static void main(String args[]) {
 
@@ -95,7 +97,7 @@ public class SimulateGC {
 	}
 	
 	/**
-	 * Parse use CLI parsed arguments to instantiate a parameters object.
+	 * Parse CLI parsed arguments to instantiate a parameters object.
 	 * @param cmd
 	 * @return Parameter settings used to invoke ETParser in non-batch mode.
 	 * @author David R White
@@ -117,6 +119,10 @@ public class SimulateGC {
 		settings.setPercentage(Integer.parseInt(cmd.getOptionValue(DELETION_SHORT)));
 		settings.setChart(cmd.hasOption(CHART_SHORT));
 		settings.setFile(cmd.getOptionValue(INPUT_SHORT));
+
+        if (cmd.hasOption(COUNTER_LONG)) {
+            settings.setCounterInterval(Integer.parseInt(cmd.getOptionValue(COUNTER_LONG)));
+        }
 
 		return settings;
 		
@@ -158,7 +164,10 @@ public class SimulateGC {
 		
 		// Help Message
 		opts.addOption(HELP_SHORT,HELP_LONG, false, "Print help information.");
-		
+
+        // Counter report frequency - how often to report (number of events) progress
+        opts.addOption(COUNTER_LONG, true, "Interval between progress reports (events). Default - no reporting.");
+
 		// Heuristic to use
 		String gcs  = "Garbage Collector. Possible garbage collectors are:";
 		for (Heuristic heuristic : Heuristic.values()) {
@@ -167,7 +176,7 @@ public class SimulateGC {
 		opts.addOption(GC_SHORT,GC_LONG, true, gcs);
 							
 		// Parameters for GC
-		opts.addOption(THRESHOLD_SHORT,THRESHOLD_LONG, true, "Theshold to trigger GC (MB).");
+		opts.addOption(THRESHOLD_SHORT,THRESHOLD_LONG, true, "Threshold to trigger GC (MB).");
 		opts.addOption(DELETION_SHORT,DELETION_LONG, true, "% to deallocate at GC");
 		
 		return opts;
